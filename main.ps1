@@ -19,39 +19,90 @@ if(-Not (Get-Command winget -errorAction SilentlyContinue)){
     Add-AppxPackage ".\WinGet.msixbundle"    
 }
 
+#Append strings to the end of the installer. At the end run installer with Invoke-Expression
+$installer = ""
+
 #Use flag --accept-source-agreements for first winget cmd
 
+#Output selections to powershell script, then execute script
 
 #Menus
+Clear-Host
+function GP-Menu{
+    param(
+        [string]$Title = 'Select GP'
+    )
+
+    Write-Host "=========================$Title==========================="
+
+    Write-Host "1: Apply Guardian Group Policy"
+    Write-Host "2: No Group Policy"
+    Write-Host "q: Quit"
+    
+
+    $selection = Read-Host "Enter your selection"
+
+    switch -Regex ($selection)
+    {
+        '1' {"`nApplying Group Policy`n"; Break} 
+        '2' {"`nSkipping Group Policy`n"; Break}
+        'q' {return} 
+        '^*' {"`nERROR: Unrecognized Option`n"; GP-Menu}
+    }
+}
+
+
+
+
+
 function PDF-Menu 
 {
     param(
         [string]$Title = 'Select a PDF Reader'
     )
-    Clear-Host
-    Write-Host "=========================$Title==========================="
+    Write-Host "`n=========================$Title==========================="
 
     Write-Host "1: Adobe Acrobat"
     Write-Host "2: Nitro"
     Write-Host "q: Quit"
+
+
+    $selection = Read-Host "Enter your selection"
+
+    switch -Regex ($selection)
+    {
+        '1' {$installer += "winget install Adobe.Acrobat.Reader.64-bit;"} 
+        '2' {'You selected Nitro Reader'} 
+        'q' {return}
+        '^*' {"`nERROR: Unrecognized Option`n"; PDF-Menu}
+    }
+}
+
+
+#Allow people to select multiple options. Restart with the selected programs missing from selection.
+function Other-Programs
+{
+    $programsAvailable = @(1, 2, 3, 4)
+
+    switch($programsAvailable){
+
+    }
+    Write-Host "1: LibreOffice"
+    Write-Host "2: Gnucash"
+    Write-Host "3: GIMP"
+    Write-Host "4: Google Earth Pro"
+    Write-Host "ImageGass"
+
 }
 
 
 
 #Menu Logic
-PDF-Menu
-$pdfReader = Read-Host "Enter your selection"
 
-switch($pdfReader)
-{
-    '1'{
-        winget install Adobe.Acrobat.Reader.64-bit
-    } '2'{
-        'You selected Nitro Reader'
-    } 'q'{
-        return
-    }
-}
+
+GP-Menu
+PDF-Menu
+
 
 
 
