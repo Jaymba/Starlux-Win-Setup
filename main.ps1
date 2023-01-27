@@ -42,6 +42,25 @@ function NetworkTest{
 
 }
 
+function CheckDrive{
+    
+    $disk = Get-PhysicalDisk
+    
+    if($disk.MediaType -eq "HDD"){
+        Write-Output "`nWARNING: HDD DETECTED.`nProceed?"
+
+        $selection = Read-Host "Enter: Y(Yes) or N(No)"
+        switch -Regex ($selection){
+            'y'{Break}
+            'n'{return}
+            '^*'{'Invalid Option';CheckDrive}
+            
+        }
+    }else{
+        Break
+    }
+}
+
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
