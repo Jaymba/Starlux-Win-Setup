@@ -12,19 +12,50 @@
 #Run windows update and reboot. Keep script running through reboot
 #Add options to disable sound, video, and images.
 
-#TO-DO check if winget is installed before installing and delete msixbundle after installation.
+function NetworkTest{
 
-if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-    Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
-    Add-AppxPackage ".\WinGet.msixbundle"    
+    param(
+        [bool] $CheckNetwork = 1
+    )
+    if($CheckNetwork){
+        
+        if(-Not (Test-Connection -ComputerName 1.1.1.1 -Quiet -ErrorAction SilentlyContinue)){
+            "Error: Please check your internet connection"
+        }else{
+            Break
+        }
+
+    }
+
+
+    Write-Host "`nr: Retry"
+    Write-Host "q: Quit"
+
+    $selection = Read-Host "Enter your selection"
+    
+    switch -Regex ($selection){
+        "r"{NetworkTest}
+        "q"{return}
+        "^*"{"Ivalid Option";NetworkTest -CheckNetwork 0}
+    }
+
+
+}
+
+function InstallWinget{
+
+    if(-Not (Get-Command winget -errorAction SilentlyContinue)){
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
+        Add-AppxPackage ".\WinGet.msixbundle"    
+        Remove-Item ".\Winget.msixbundle"
+    }
+
+    #Random winget cmd used to accept agreements
+    winget search --accept-source-agreements Acc > $null
 }
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $installer = ""
-
-#Use flag --accept-source-agreements for first winget cmd
-
-#Output selections to powershell script, then execute script
 
 #Menus
 Clear-Host
@@ -116,7 +147,7 @@ function Other-Programs
 
 }
 
-
+NetworkTest
 
 #Menu Logic
 Rename-Menu

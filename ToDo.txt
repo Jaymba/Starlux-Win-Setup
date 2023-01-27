@@ -1,4 +1,3 @@
-1. Have powershell script install AppInstaller(winget)
-2. Create list of common apps
-3. Add options for disable sound.
-4. Include video and sound options
+Create list of common apps
+Add options for disable sound.
+Include video and sound options
