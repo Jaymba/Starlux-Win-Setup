@@ -28,6 +28,28 @@ $installer = ""
 
 #Menus
 Clear-Host
+
+function Rename-Menu{
+    $newname = Read-Host "Enter the new name"
+
+    Rename-Device -NewName $newname 
+}
+function Rename-Device
+{
+    param(
+        [string]$NewName
+    )
+
+    $confirm = Read-Host "The new name will be:" $newname "`nIs that correct?`nType Y(yes) or N(no)"
+
+    switch -Regex ($confirm){
+        'y'{ "Change Name"; return}
+        'n'{Rename-Menu}
+        '^*'{'Enter a valid option';Rename-Device}
+    }
+}
+
+
 function GP-Menu{
     param(
         [string]$Title = 'Select GP'
@@ -79,14 +101,13 @@ function PDF-Menu
 }
 
 
-#Allow people to select multiple options. Restart with the selected programs missing from selection.
 function Other-Programs
 {
     $programsAvailable = @(1, 2, 3, 4)
 
-    switch($programsAvailable){
-
-    }
+#    switch($programsAvailable){
+#
+#    }
     Write-Host "1: LibreOffice"
     Write-Host "2: Gnucash"
     Write-Host "3: GIMP"
@@ -98,7 +119,7 @@ function Other-Programs
 
 
 #Menu Logic
-
+Rename-Menu
 
 GP-Menu
 PDF-Menu
