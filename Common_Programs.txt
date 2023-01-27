@@ -1,0 +1,19 @@
+PDF
+  Adobe Acrobat
+  Nitro PDF Reader
+  Foxit
+
+Thunderbird
+Libreoffice
+Teamviewer
+GnuCash
+
+Gimp
+ImageGlass
+VLC Media Player
+
+Incompatible With winget
+Quickbooks
+MS 365
+Acronis
+Sentinel
