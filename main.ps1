@@ -210,12 +210,12 @@ function Other-Programs
         switch -Regex ($selection)
         {
             '1' {$installer += "winget install Mozilla.Thunderbird`n";Other-Programs ($programsAvailable -ne '1')}
-            '2' {$installer += "winget install TheDocumentFoundation.LibreOffice";Other-Programs ($programsAvailable -ne '2')}
-            '3' {$installer += "winget install GIMP.GIMP";Other-Programs ($programsAvailable -ne '3')}
-            '4' {$installer += "winget install DuongDieuPhap.ImageGlass";Other-Programs ($programsAvailable -ne '4')}
-            '5' {$installer += "winget install VideoLAN.VLC";Other-Programs ($programsAvailable -ne '5')}
-            '6' {$installer += "winget install GnuCash.GnuCash";Other-Programs ($programsAvailable -ne '6')}
-            '7' {$installer += "winget install Google.EarthPro";Other-Programs ($programsAvailable -ne '7')}
+            '2' {$installer += "winget install TheDocumentFoundation.LibreOffice`n";Other-Programs ($programsAvailable -ne '2')}
+            '3' {$installer += "winget install GIMP.GIMP`n";Other-Programs ($programsAvailable -ne '3')}
+            '4' {$installer += "winget install DuongDieuPhap.ImageGlass`n";Other-Programs ($programsAvailable -ne '4')}
+            '5' {$installer += "winget install VideoLAN.VLC`n";Other-Programs ($programsAvailable -ne '5')}
+            '6' {$installer += "winget install GnuCash.GnuCash`n";Other-Programs ($programsAvailable -ne '6')}
+            '7' {$installer += "winget install Google.EarthPro`n";Other-Programs ($programsAvailable -ne '7')}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option"; Other-Programs $programsAvailable}
             
