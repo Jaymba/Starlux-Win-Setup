@@ -105,7 +105,7 @@ function Rename-Device
 
 
     switch -Regex ($confirm){
-        'y'{ "Change Name";return}
+        'y'{ $global:installer += "Rename-Computer -NewName " + $NewName + "`n";return}
         'n'{Rename-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Rename-Device}
     }
@@ -116,7 +116,7 @@ function Rename-Device
 function User-Menu{
     $newname = Read-Host "Enter a name for the User"
 
-    Rename-Device -NewName $newname 
+    Create-User -NewName $newname 
 }
 
 
@@ -137,11 +137,29 @@ function Create-User
 
 
     switch -Regex ($confirm){
-        'y'{ "Change Name";return}
+        'y'{ $global:installer += "`nNew-LocalUser -Name " + $NewName + "`n";break}
         'n'{User-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
+    Set-Admin $NewName
+
 }
+
+function Set-Admin
+{
+    param(
+        [string] $Name
+    )
+
+    $admin = Read-Host "`nSet User as administator?`nType: Y(Yes) or N(No)"
+
+    switch -Regex ($admin){
+        'y' { $global:installer += "Add-LocalGroupMember -Group Administrators -Member " + $Name + "`n";return}
+        'n' {return}
+        '^*'{"Error: Unrecognized Option."; Set-Admin $name}
+    }
+}    
+
 
 
 function GP-Menu
