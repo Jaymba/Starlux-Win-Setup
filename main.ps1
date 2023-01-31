@@ -75,6 +75,7 @@ function InstallWinget{
     winget search --accept-source-agreements Acc > $null
 }
 
+
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $global:installer = ""
 
@@ -107,6 +108,38 @@ function Rename-Device
         'y'{ "Change Name";return}
         'n'{Rename-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Rename-Device}
+    }
+}
+
+
+
+function User-Menu{
+    $newname = Read-Host "Enter a name for the User"
+
+    Rename-Device -NewName $newname 
+}
+
+
+function Create-User
+{
+    param(
+        [string]$NewName
+    )
+
+    if((-Not $NewName) -or ($NewName.StartsWith(" ")))
+    {
+        Write-Output "`nName cannot be empty or start with a space.`nPlease Try Again.`n"
+        User-Menu
+        return
+    }
+
+    $confirm = Read-Host "`nThe Username will be:" $newname "`nIs that correct?`nType Y(yes) or N(no)"
+
+
+    switch -Regex ($confirm){
+        'y'{ "Change Name";return}
+        'n'{User-Menu;return}
+        '^*'{'ERROR: Unrecognized Option';Create-User}
     }
 }
 
@@ -248,6 +281,8 @@ NetworkTest
 
 #Menu Logic
 Rename-Menu
+User-Menu
+
 Install-TV
 
 GP-Menu
