@@ -209,7 +209,7 @@ function Other-Programs
 
         switch -Regex ($selection)
         {
-            '1' {$installer += "winget install Mozilla.Thunderbird";Other-Programs ($programsAvailable -ne '1')}
+            '1' {$installer += "winget install Mozilla.Thunderbird`n";Other-Programs ($programsAvailable -ne '1')}
             '2' {$installer += "winget install TheDocumentFoundation.LibreOffice";Other-Programs ($programsAvailable -ne '2')}
             '3' {$installer += "winget install GIMP.GIMP";Other-Programs ($programsAvailable -ne '3')}
             '4' {$installer += "winget install DuongDieuPhap.ImageGlass";Other-Programs ($programsAvailable -ne '4')}
