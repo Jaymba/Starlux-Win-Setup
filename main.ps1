@@ -76,7 +76,7 @@ function InstallWinget{
 }
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
-$installer = ""
+$global:installer = ""
 
 #Menus
 
@@ -93,11 +93,19 @@ function Rename-Device
         [string]$NewName
     )
 
+    if((-Not $NewName) -or ($NewName.StartsWith(" ")))
+    {
+        Write-Output "`nName cannot be empty or start with a space.`nPlease Try Again.`n"
+        Rename-Menu
+        return
+    }
+
     $confirm = Read-Host "`nThe device name will be:" $newname "`nIs that correct?`nType Y(yes) or N(no)"
 
+
     switch -Regex ($confirm){
-        'y'{ "Change Name"; return}
-        'n'{Rename-Menu}
+        'y'{ "Change Name";return}
+        'n'{Rename-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Rename-Device}
     }
 }
@@ -109,7 +117,7 @@ function GP-Menu
         [string]$Title = 'Select GP'
     )
 
-    Write-Host "=========================$Title==========================="
+    Write-Host "`n=========================$Title==========================="
 
     Write-Host "1: Apply Guardian Group Policy"
     Write-Host "2: No Group Policy"
@@ -127,7 +135,14 @@ function GP-Menu
     }
 }
 
+function Install-TV
+{
+    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
 
+}
+
+
+#Discarded in favor of installing TV Host without prompt
 function TV-Menu
 {
     Write-Host "1: Teamviewer Host"
@@ -136,8 +151,8 @@ function TV-Menu
     $selection = Read-Host "Enter your selection"
 
     switch -Regex ($selection){
-        '1' {$installer += "winget install TeamViewer.TeamViewer.Host;";return}
-        '2' {$installer += "winget install TeamViewer.TeamViewer;";return}
+        '1' {$global:installer += "winget install TeamViewer.TeamViewer.Host`n";return}
+        '2' {$global:installer += "winget install TeamViewer.TeamViewer`n";return}
         '^*' {"ERROR: Unrecognized Option";TV-Menu}
     }
 }
@@ -152,7 +167,7 @@ function PDF-Menu
 
     Write-Host "1: Adobe Acrobat"
     Write-Host "2: Nitro Pro"
-    Wirte-Host "3: Foxit PDF"
+    Write-Host "3: Foxit PDF"
     Write-Host "q: Quit"
 
 
@@ -160,28 +175,28 @@ function PDF-Menu
 
     switch -Regex ($selection)
     {
-        '1' {$installer += "winget install Adobe.Acrobat.Reader.64-bit;";return} 
+        '1' {$global:installer += "winget install Adobe.Acrobat.Reader.64-bit`n";return} 
         '2' {'You selected Nitro Reader';return} 
-        '3' {$installer += "winget install Foxit.FoxitReader"}
+        '3' {$global:installer += "winget install Foxit.FoxitReader`n";return}
         'q' {Break}
         '^*' {"`nERROR: Unrecognized Option`n"; PDF-Menu}
     }
 }
 
 
-function Other-Programs
+function Programs-Menu
 {
     param(
         
-        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7')
+        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7','d')
     )
 
 #    switch($programsAvailable){
 #
 #    }
-    Write-Output $programsAvailable
+
     switch -Regex ($programsAvailable){
-        '1' {Write-Host "1: Thunderbird"}
+        '1' {Write-Host "`n1: Thunderbird"}
         '2' {Write-Host "2: LibreOffice"}
         '3' {Write-Host "3: GIMP"}
         '4' {Write-Host "4: ImageGlass"}
@@ -191,33 +206,33 @@ function Other-Programs
         'd' {Write-Host "D: Done"}
     }
 
-    $selection = Read-Host "Enter your selection"
+    $selection = Read-Host "`nEnter your selection"
     
 #    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
-    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
+    if(-Not ($programsAvailable.Contains($selection))){
         
         if(($selection -gt 0) -or ($selection -lt 8))
         {
             "ERROR: Option has already been selected."
-            Other-Programs $programsAvailable
+            Programs-Menu $programsAvailable
         }else{
             Write-Output "ERROR: Unrecognized Option"
-            Other-Programs $programsAvailable
+            Programs-Menu $programsAvailable
         }
 
     }else{
 
         switch -Regex ($selection)
         {
-            '1' {$installer += "winget install Mozilla.Thunderbird`n";Other-Programs ($programsAvailable -ne '1')}
-            '2' {$installer += "winget install TheDocumentFoundation.LibreOffice`n";Other-Programs ($programsAvailable -ne '2')}
-            '3' {$installer += "winget install GIMP.GIMP`n";Other-Programs ($programsAvailable -ne '3')}
-            '4' {$installer += "winget install DuongDieuPhap.ImageGlass`n";Other-Programs ($programsAvailable -ne '4')}
-            '5' {$installer += "winget install VideoLAN.VLC`n";Other-Programs ($programsAvailable -ne '5')}
-            '6' {$installer += "winget install GnuCash.GnuCash`n";Other-Programs ($programsAvailable -ne '6')}
-            '7' {$installer += "winget install Google.EarthPro`n";Other-Programs ($programsAvailable -ne '7')}
+            '1' {$global:installer += "winget install Mozilla.Thunderbird`n";Programs-Menu ($programsAvailable -ne '1');return}
+            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice`n";Programs-Menu ($programsAvailable -ne '2');return}
+            '3' {$global:installer += "winget install GIMP.GIMP`n";Programs-Menu ($programsAvailable -ne '3');return}
+            '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass`n";Programs-Menu ($programsAvailable -ne '4');return}
+            '5' {$global:installer += "winget install VideoLAN.VLC`n";Programs-Menu ($programsAvailable -ne '5');return}
+            '6' {$global:installer += "winget install GnuCash.GnuCash`n";Programs-Menu ($programsAvailable -ne '6');return}
+            '7' {$global:installer += "winget install Google.EarthPro`n";Programs-Menu ($programsAvailable -ne '7');return}
             'd' {return}
-            '^*' {"ERROR: Unrecognized Option"; Other-Programs $programsAvailable}
+            '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
 
         }
@@ -233,13 +248,14 @@ NetworkTest
 
 #Menu Logic
 Rename-Menu
-TV-Menu
+Install-TV
 
 GP-Menu
 PDF-Menu
 
+Programs-Menu
 
-
+Set-Content -Path .\installer.ps1 -Value $global:installer
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
