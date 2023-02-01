@@ -179,16 +179,21 @@ function GP-Menu
 
     switch -Regex ($selection)
     {
-        '1' {"`nApplying Group Policy`n"; return} 
+        '1' {Apply-GP; return} 
         '2' {"`nSkipping Group Policy`n"; return}
         'q' {return} 
         '^*' {"`nERROR: Unrecognized Option`n"; GP-Menu}
     }
 }
 
+function Apply-GP
+{
+    $global:installer += "`nCopy-Item 'GP\*' 'C:\Program Files'`n`n"
+}
+
 function Install-TV
 {
-    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
+    winget install TeamViewer.TeamViewer.Host
 
 }
 
@@ -295,6 +300,15 @@ function Programs-Menu
 
 }
 
+function Update-Windows
+{
+    $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
+    $global:installer += "Install-Module PSWindowsUpdate -Force`n"
+
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n"
+
+}
+
 NetworkTest
 
 #Menu Logic
@@ -307,6 +321,7 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
+Update-Windows
 
 Set-Content -Path .\installer.ps1 -Value $global:installer
 
