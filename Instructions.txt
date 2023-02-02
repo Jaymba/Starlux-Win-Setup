@@ -1,5 +1,0 @@
-Open powershell as admin
-
-Enter: Set-ExecutionPolicy Unrestricted
-
-Right click main.ps1 and select "Open with Powershell"
