@@ -3,4 +3,6 @@ Add options for disable sound.
 Include video and sound options
 
 
-Add logic for User Creation, Device Renaming, Apply GP 
+Set quit option to exit script
+
+Set the user password to empty

@@ -14,6 +14,8 @@
 
 Clear-Host
 
+Set-TimeZone "Eastern Standard Time"
+
 if (!
     #current role
     (New-Object Security.Principal.WindowsPrincipal(
@@ -58,7 +60,7 @@ function NetworkTest{
     
     switch -Regex ($selection){
         "r"{NetworkTest}
-        "q"{return}
+        "q"{exit}
         "^*"{"Ivalid Option";NetworkTest -CheckNetwork 0}
     }
 
@@ -75,13 +77,22 @@ function CheckDrive{
         $selection = Read-Host "Enter: Y(Yes) or N(No)"
         switch -Regex ($selection){
             'y'{return}
-            'n'{Break}
+            'n'{exit}
             '^*'{'Invalid Option';CheckDrive}
             
         }
     }else{
         Break
     }
+}
+
+function Change-Power-Settings
+{
+    powercfg /Change monitor-timeout-ac 10
+
+    powercfg /Change standby-timeout-ac 120
+    
+
 }
 
 function InstallWinget{
@@ -176,7 +187,7 @@ function Set-Admin
 
     switch -Regex ($admin){
         'y' { $global:installer += "Add-LocalGroupMember -Group Administrators -Member " + $Name + "`n";return}
-        'n' {return}
+        'n' { $global:installer += "Add-LocalGroupMember -Group Users -Member " + $Name + "`n";return}
         '^*'{"Error: Unrecognized Option."; Set-Admin $name}
     }
 }    
@@ -202,14 +213,14 @@ function GP-Menu
     {
         '1' {Apply-GP; return} 
         '2' {"`nSkipping Group Policy`n"; return}
-        'q' {return} 
+        'q' {exit} 
         '^*' {"`nERROR: Unrecognized Option`n"; GP-Menu}
     }
 }
 
 function Apply-GP
 {
-    $global:installer += "`nCopy-Item 'GP\*' 'C:\Program Files'`n`n"
+    $global:installer += "`nCopy-Item 'GP\*' -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
@@ -255,7 +266,7 @@ function PDF-Menu
         '1' {$global:installer += "winget install Adobe.Acrobat.Reader.64-bit`n";return} 
         '2' {'You selected Nitro Reader';return} 
         '3' {$global:installer += "winget install Foxit.FoxitReader`n";return}
-        'q' {Break}
+        'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; PDF-Menu}
     }
 }
@@ -332,9 +343,13 @@ function Update-Windows
 
 NetworkTest
 
+Change-Power-Settings
+
 #Menu Logic
 Rename-Menu
 User-Menu
+
+InstallWinget
 
 Install-TV
 
