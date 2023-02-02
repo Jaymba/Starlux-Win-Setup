@@ -1,8 +1,0 @@
-Create list of common apps
-Add options for disable sound.
-Include video and sound options
-
-
-Set quit option to exit script
-
-Set the user password to empty
