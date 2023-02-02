@@ -9,7 +9,6 @@
 
 
 #TO-DO
-#Run windows update and reboot. Keep script running through reboot
 #Add options to disable sound, video, and images.
 
 Clear-Host
@@ -357,6 +356,7 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
+./decrapifier.ps1
 Update-Windows
 
 Set-Content -Path .\installer.ps1 -Value $global:installer
