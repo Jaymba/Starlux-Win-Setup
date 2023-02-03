@@ -10,6 +10,7 @@
 
 #TO-DO
 #Add options to disable sound, video, and images.
+#Checkout Plain Connections for list of software
 
 Clear-Host
 
@@ -97,6 +98,7 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
+        Add-AppxPackage "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
         Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
         Add-AppxPackage ".\WinGet.msixbundle"    
         Remove-Item ".\Winget.msixbundle"
@@ -356,7 +358,9 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
+
 ./decrapifier.ps1
+
 Update-Windows
 
 Set-Content -Path .\installer.ps1 -Value $global:installer
