@@ -112,6 +112,8 @@ function InstallWinget{
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $global:installer = ""
 
+$global:path = $MyInvocation.MyCommand.Path | Split-Path -Parent
+
 #Menus
 
 function Rename-Menu{
@@ -221,7 +223,8 @@ function GP-Menu
 
 function Apply-GP
 {
-    $global:installer += "`nCopy-Item 'GP\*' -Destination 'C:\Windows\System32 -Force'`n`n"
+    $GPPath = $global:path + "\GP\*"
+    $global:installer += "`nCopy-Item " + $GPpath + " -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
@@ -359,7 +362,7 @@ PDF-Menu
 
 Programs-Menu
 
-#./decrapifier.ps1
+Invoke-Expression $global:path + "\decrapifier.ps1"
 
 Update-Windows
 
