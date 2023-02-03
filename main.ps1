@@ -359,7 +359,7 @@ PDF-Menu
 
 Programs-Menu
 
-./decrapifier.ps1
+#./decrapifier.ps1
 
 Update-Windows
 
