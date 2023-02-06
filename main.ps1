@@ -224,7 +224,7 @@ function Apply-GP
 
 function Install-TV
 {
-    winget install TeamViewer.TeamViewer.Host
+    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
 
 }
 
