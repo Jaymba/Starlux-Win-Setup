@@ -10,7 +10,6 @@
 
 #TO-DO
 #Add options to disable sound, video, and images.
-#Checkout Plain Connections for list of software
 
 Clear-Host
 
@@ -98,7 +97,6 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Add-AppxPackage "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
         Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
         Add-AppxPackage ".\WinGet.msixbundle"    
         Remove-Item ".\Winget.msixbundle"
@@ -111,8 +109,6 @@ function InstallWinget{
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $global:installer = ""
-
-$global:path = $MyInvocation.MyCommand.Path | Split-Path -Parent
 
 #Menus
 
@@ -223,8 +219,7 @@ function GP-Menu
 
 function Apply-GP
 {
-    $GPPath = $global:path + "\GP\*"
-    $global:installer += "`nCopy-Item " + $GPpath + " -Destination 'C:\Windows\System32 -Force'`n`n"
+    $global:installer += "`nCopy-Item 'GP\*' -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
@@ -361,9 +356,7 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
-
-Invoke-Expression $global:path + "\decrapifier.ps1"
-
+./decrapifier.ps1
 Update-Windows
 
 Set-Content -Path .\installer.ps1 -Value $global:installer
