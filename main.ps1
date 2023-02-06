@@ -98,10 +98,10 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Add-AppxPackage "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
-        Add-AppxPackage ".\WinGet.msixbundle"    
-        Remove-Item ".\Winget.msixbundle"
+        $global:installer = "`nAdd-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile '.\WinGet.msixbundle'
+        Add-AppxPackage '.\WinGet.msixbundle' 
+        Remove-Item '.\Winget.msixbundle'`n"
     }
 
     #Random winget cmd used to accept agreements
@@ -229,7 +229,7 @@ function Apply-GP
 
 function Install-TV
 {
-    winget install TeamViewer.TeamViewer.Host
+    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
 
 }
 
@@ -336,13 +336,29 @@ function Programs-Menu
 
 }
 
-function Update-Windows
+workflow Reboot-And-Wait
 {
-    $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
-    $global:installer += "Install-Module PSWindowsUpdate -Force`n"
+    Restart-Computer -Wait
+}
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n"
+workflow Update-Windows
+{
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Install-Module PSWindowsUpdate -Force
+    
+    $updates = Get-WindowsUpdate
 
+    while($updates){
+        Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
+
+        Reboot-And-Wait
+
+        $updates = Get-WindowsUpdate
+
+    }
+    
+    Write-Output "No More Update"
+    
 }
 
 NetworkTest
@@ -364,10 +380,11 @@ Programs-Menu
 
 Invoke-Expression $global:path + "\decrapifier.ps1"
 
-Update-Windows
 
-Set-Content -Path .\installer.ps1 -Value $global:installer
+Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
 Invoke-Expression -Command $global:installer
+
+Update-Windows
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
