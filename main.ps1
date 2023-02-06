@@ -262,9 +262,9 @@ function PDF-Menu
 
     switch -Regex ($selection)
     {
-        '1' {$global:installer += "winget install Adobe.Acrobat.Reader.64-bit`n";return} 
+        '1' {$global:installer += "winget install Adobe.Acrobat.Reader.64-bit --scope machine`n";return} 
         '2' {'You selected Nitro Reader';return} 
-        '3' {$global:installer += "winget install Foxit.FoxitReader`n";return}
+        '3' {$global:installer += "winget install Foxit.FoxitReader --scope machine`n";return}
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; PDF-Menu}
     }
@@ -311,13 +311,13 @@ function Programs-Menu
 
         switch -Regex ($selection)
         {
-            '1' {$global:installer += "winget install Mozilla.Thunderbird`n";Programs-Menu ($programsAvailable -ne '1');return}
-            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice`n";Programs-Menu ($programsAvailable -ne '2');return}
-            '3' {$global:installer += "winget install GIMP.GIMP`n";Programs-Menu ($programsAvailable -ne '3');return}
-            '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass`n";Programs-Menu ($programsAvailable -ne '4');return}
-            '5' {$global:installer += "winget install VideoLAN.VLC`n";Programs-Menu ($programsAvailable -ne '5');return}
-            '6' {$global:installer += "winget install GnuCash.GnuCash`n";Programs-Menu ($programsAvailable -ne '6');return}
-            '7' {$global:installer += "winget install Google.EarthPro`n";Programs-Menu ($programsAvailable -ne '7');return}
+            '1' {$global:installer += "winget install Mozilla.Thunderbird --scope machine`n";Programs-Menu ($programsAvailable -ne '1');return}
+            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n";Programs-Menu ($programsAvailable -ne '2');return}
+            '3' {$global:installer += "winget install GIMP.GIMP --scope machine`n";Programs-Menu ($programsAvailable -ne '3');return}
+            '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass --scope machine`n";Programs-Menu ($programsAvailable -ne '4');return}
+            '5' {$global:installer += "winget install VideoLAN.VLC --scope machine`n";Programs-Menu ($programsAvailable -ne '5');return}
+            '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n";Programs-Menu ($programsAvailable -ne '6');return}
+            '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
