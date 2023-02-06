@@ -97,13 +97,13 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
-        Add-AppxPackage ".\WinGet.msixbundle"    
-        Remove-Item ".\Winget.msixbundle"
+        $global:installer += "Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile '.\WinGet.msixbundle'`n"
+        $global:installer += "Add-AppxPackage '.\WinGet.msixbundle'`n"    
+        $global:installer += "Remove-Item '.\Winget.msixbundle'`n"
     }
 
     #Random winget cmd used to accept agreements
-    winget search --accept-source-agreements Acc > $null
+    $global:installer += "`nwinget search --accept-source-agreements Acc > $null`n"
 }
 
 
@@ -224,7 +224,7 @@ function Apply-GP
 
 function Install-TV
 {
-    winget install TeamViewer.TeamViewer.Host
+    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
 
 }
 
