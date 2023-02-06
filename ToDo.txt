@@ -1,5 +1,0 @@
-Create list of common apps
-Add options for disable sound.
-Include video and sound options
-
-

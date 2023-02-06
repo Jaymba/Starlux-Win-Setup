@@ -10,7 +10,6 @@
 
 #TO-DO
 #Add options to disable sound, video, and images.
-#Checkout Plain Connections for list of software
 
 Clear-Host
 
@@ -98,10 +97,9 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        $global:installer = "`nAdd-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
-        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile '.\WinGet.msixbundle'
-        Add-AppxPackage '.\WinGet.msixbundle' 
-        Remove-Item '.\Winget.msixbundle'`n"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile ".\WinGet.msixbundle"
+        Add-AppxPackage ".\WinGet.msixbundle"    
+        Remove-Item ".\Winget.msixbundle"
     }
 
     #Random winget cmd used to accept agreements
@@ -111,8 +109,6 @@ function InstallWinget{
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $global:installer = ""
-
-$global:path = $MyInvocation.MyCommand.Path | Split-Path -Parent
 
 #Menus
 
@@ -223,13 +219,12 @@ function GP-Menu
 
 function Apply-GP
 {
-    $GPPath = $global:path + "\GP\*"
-    $global:installer += "`nCopy-Item " + $GPpath + " -Destination 'C:\Windows\System32 -Force'`n`n"
+    $global:installer += "`nCopy-Item 'GP\*' -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
 {
-    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
+    winget install TeamViewer.TeamViewer.Host
 
 }
 
@@ -336,29 +331,13 @@ function Programs-Menu
 
 }
 
-workflow Reboot-And-Wait
+function Update-Windows
 {
-    Restart-Computer -Wait
-}
+    $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
+    $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-workflow Update-Windows
-{
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Install-Module PSWindowsUpdate -Force
-    
-    $updates = Get-WindowsUpdate
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n"
 
-    while($updates){
-        Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
-
-        Reboot-And-Wait
-
-        $updates = Get-WindowsUpdate
-
-    }
-    
-    Write-Output "No More Update"
-    
 }
 
 NetworkTest
@@ -377,14 +356,11 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
-
-Invoke-Expression $global:path + "\decrapifier.ps1"
-
-
-Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
-Invoke-Expression -Command $global:installer
-
+./decrapifier.ps1
 Update-Windows
+
+Set-Content -Path .\installer.ps1 -Value $global:installer
+Invoke-Expression -Command $global:installer
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
