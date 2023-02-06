@@ -356,10 +356,10 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
-./decrapifier.ps1
+Invoke-Expression $global:path + "\decrapifier.ps1"
 Update-Windows
 
-Set-Content -Path .\installer.ps1 -Value $global:installer
+Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
 Invoke-Expression -Command $global:installer
 
 #uninstall winget
