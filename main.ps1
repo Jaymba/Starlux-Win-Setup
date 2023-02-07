@@ -19,7 +19,6 @@ $global:installer = ""
 $global:username = ""
 $global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
 
-Read-Host $global:path
 
 if (!
     #current role
