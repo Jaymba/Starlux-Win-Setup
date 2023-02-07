@@ -58,7 +58,7 @@ function NetworkTest{
     $selection = Read-Host "Enter your selection"
     
     switch -Regex ($selection){
-        "r"{NetworkTest}
+        "r"{NetworkTest;return}
         "q"{exit}
         "^*"{"Ivalid Option";NetworkTest -CheckNetwork 0}
     }
@@ -145,9 +145,9 @@ function Rename-Device
 
 
 function User-Menu{
-    $newname = Read-Host "Enter a name for the User"
+    $global:username = Read-Host "Enter a name for the User"
 
-    Create-User -NewName $newname 
+    Create-User -NewName $global:username -NoPassword 
 }
 
 
@@ -224,7 +224,7 @@ function Apply-GP
 
 function Install-TV
 {
-    $global:installer += "winget install TeamViewer.TeamViewer.Host`n"
+    $global:installer += "winget install TeamViewer.TeamViewer.Host --scope machine`n"
 
 }
 
@@ -356,7 +356,11 @@ GP-Menu
 PDF-Menu
 
 Programs-Menu
+
+Enter-PSSession -ComputerName localhost -Credential $global:username
 Invoke-Expression $global:path + "\decrapifier.ps1"
+Exit-PSSession
+
 Update-Windows
 
 Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
