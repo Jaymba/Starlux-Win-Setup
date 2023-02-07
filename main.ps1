@@ -362,11 +362,14 @@ Programs-Menu
 #Invoke-Expression $global:path + '\decrapifier.ps1'`n
 #Exit-PSSession
 #"@
+Wait-Event
 
 Update-Windows
 
+Wait-Event
+
 Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
-Invoke-Expression -Command $global:installer
+#Invoke-Expression -Command $global:installer
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
