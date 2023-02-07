@@ -15,11 +15,6 @@ Clear-Host
 
 Set-TimeZone "Eastern Standard Time"
 
-$global:installer = ""
-$global:username = ""
-$global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
-
-
 if (!
     #current role
     (New-Object Security.Principal.WindowsPrincipal(
@@ -40,6 +35,12 @@ if (!
         -Verb RunAs
     exit
 }
+
+$global:installer = ""
+$global:username = ""
+$global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
+
+
 
 function NetworkTest{
 
