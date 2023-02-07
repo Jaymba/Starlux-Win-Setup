@@ -147,7 +147,7 @@ function Rename-Device
 function User-Menu{
     $global:username = Read-Host "Enter a name for the User"
 
-    Create-User -NewName $global:username -NoPassword 
+    Create-User -NewName $global:username 
 }
 
 
@@ -357,9 +357,11 @@ PDF-Menu
 
 Programs-Menu
 
-Enter-PSSession -ComputerName localhost -Credential $global:username
-Invoke-Expression $global:path + "\decrapifier.ps1"
+$global:installer += @"
+Enter-PSSession -ComputerName localhost -Credential $global:username`n
+Invoke-Expression $global:path + '\decrapifier.ps1'`n
 Exit-PSSession
+"@
 
 Update-Windows
 
