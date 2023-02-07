@@ -15,6 +15,12 @@ Clear-Host
 
 Set-TimeZone "Eastern Standard Time"
 
+$global:installer = ""
+$global:username = ""
+$global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
+
+Read-Host $global:path
+
 if (!
     #current role
     (New-Object Security.Principal.WindowsPrincipal(
@@ -168,7 +174,7 @@ function Create-User
 
 
     switch -Regex ($confirm){
-        'y'{ $global:installer += "`nNew-LocalUser -Name " + $NewName + "`n";break}
+        'y'{ $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
         'n'{User-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
@@ -357,19 +363,17 @@ PDF-Menu
 
 Programs-Menu
 
-#$global:installer += @"
+$global:installer += @"
 #Enter-PSSession -ComputerName localhost -Credential $global:username`n
 #Invoke-Expression $global:path + '\decrapifier.ps1'`n
 #Exit-PSSession
-#"@
-Wait-Event
+"@
 
 Update-Windows
 
-Wait-Event
 
-Set-Content -Path $global:path + "\installer.ps1" -Value $global:installer
-#Invoke-Expression -Command $global:installer
+Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
+Invoke-Expression -Command $global:installer
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
