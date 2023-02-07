@@ -109,7 +109,7 @@ function InstallWinget{
     }
 
     #Random winget cmd used to accept agreements
-    $global:installer += "`nwinget search --accept-source-agreements Acc > $null`n"
+    $global:installer += "`nwinget search --accept-source-agreements Acc > `$null`n"
 }
 
 
