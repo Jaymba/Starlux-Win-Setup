@@ -357,11 +357,11 @@ PDF-Menu
 
 Programs-Menu
 
-$global:installer += @"
-Enter-PSSession -ComputerName localhost -Credential $global:username`n
-Invoke-Expression $global:path + '\decrapifier.ps1'`n
-Exit-PSSession
-"@
+#$global:installer += @"
+#Enter-PSSession -ComputerName localhost -Credential $global:username`n
+#Invoke-Expression $global:path + '\decrapifier.ps1'`n
+#Exit-PSSession
+#"@
 
 Update-Windows
 
