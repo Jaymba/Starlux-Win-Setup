@@ -103,6 +103,7 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
+        $global:installer += "Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'"
         $global:installer += "Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')`n"
         $global:installer += "Add-AppxPackage ($global:path + '\WinGet.msixbundle')`n"
         $global:installer += "Remove-Item ($global:path + '.\Winget.msixbundle')`n`n"
