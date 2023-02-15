@@ -226,7 +226,7 @@ function GP-Menu
 
 function Apply-GP
 {
-    $global:installer += "`nCopy-Item ($global:path + 'GP\*') -Destination 'C:\Windows\System32 -Force'`n`n"
+    $global:installer += "`nCopy-Item ($global:path + '\GP\*') -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
