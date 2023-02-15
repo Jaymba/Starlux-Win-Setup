@@ -103,14 +103,14 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        $global:installer += "Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'"
-        $global:installer += "Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')`n"
-        $global:installer += "Add-AppxPackage ($global:path + '\WinGet.msixbundle')`n"
-        $global:installer += "Remove-Item ($global:path + '.\Winget.msixbundle')`n`n"
+        Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
+        Add-AppxPackage ($global:path + '\WinGet.msixbundle')
+        Remove-Item ($global:path + '.\Winget.msixbundle')
     }
 
     #Random winget cmd used to accept agreements
-    $global:installer += "winget search --accept-source-agreements Acc > `$null`n`n"
+    winget search --accept-source-agreements Acc > $null
 }
 
 
@@ -352,7 +352,6 @@ NetworkTest
 Change-Power-Settings
 
 #Menu Logic
-InstallWinget
 
 Rename-Menu
 User-Menu
@@ -372,11 +371,12 @@ Programs-Menu
 #"@
 
 
-Update-Windows
+Install-Winget
 
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
 Invoke-Expression -Command $global:installer
 
+Update-Windows
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
