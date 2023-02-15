@@ -371,7 +371,7 @@ Programs-Menu
 #"@
 
 
-Install-Winget
+InstallWinget
 
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
