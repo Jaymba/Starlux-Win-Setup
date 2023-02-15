@@ -352,6 +352,8 @@ NetworkTest
 Change-Power-Settings
 
 #Menu Logic
+InstallWinget
+
 Rename-Menu
 User-Menu
 
@@ -369,7 +371,6 @@ Programs-Menu
 ##Exit-PSSession
 #"@
 
-InstallWinget
 
 Update-Windows
 
