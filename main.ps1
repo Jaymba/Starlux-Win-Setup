@@ -373,10 +373,10 @@ Programs-Menu
 
 InstallWinget
 
+Update-Windows
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
 Invoke-Expression -Command $global:installer
 
-Update-Windows
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
