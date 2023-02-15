@@ -103,13 +103,13 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        $global:installer += "Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile '.\WinGet.msixbundle'`n"
-        $global:installer += "Add-AppxPackage '.\WinGet.msixbundle'`n"    
-        $global:installer += "Remove-Item '.\Winget.msixbundle'`n"
+        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile '.\WinGet.msixbundle'
+        Add-AppxPackage '.\WinGet.msixbundle'    
+        Remove-Item '.\Winget.msixbundle'
     }
 
     #Random winget cmd used to accept agreements
-    $global:installer += "`nwinget search --accept-source-agreements Acc > `$null`n"
+    winget search --accept-source-agreements Acc > $null
 }
 
 
@@ -354,7 +354,6 @@ Change-Power-Settings
 Rename-Menu
 User-Menu
 
-InstallWinget
 
 Install-TV
 
@@ -368,6 +367,8 @@ Programs-Menu
 ##Invoke-Expression $global:path + '\decrapifier.ps1'`n
 ##Exit-PSSession
 #"@
+
+InstallWinget
 
 Update-Windows
 
