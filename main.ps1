@@ -106,7 +106,7 @@ function InstallWinget{
         Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
         Add-AppxPackage ($global:path + '\WinGet.msixbundle')
-        Remove-Item ($global:path + '.\Winget.msixbundle')
+        Remove-Item ($global:path + '\Winget.msixbundle')
     }
 
     #Random winget cmd used to accept agreements
@@ -226,7 +226,7 @@ function GP-Menu
 
 function Apply-GP
 {
-    $global:installer += "`nCopy-Item ($global:path + '\GP\*') -Destination 'C:\Windows\System32 -Force'`n`n"
+    $global:installer += "`nCopy-Item (" + $global:path + "'\GP\*') -Destination 'C:\Windows\System32 -Force'`n`n"
 }
 
 function Install-TV
