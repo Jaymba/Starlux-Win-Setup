@@ -103,13 +103,13 @@ function Change-Power-Settings
 function InstallWinget{
 
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
-        Add-AppxPackage ($global:path + '\WinGet.msixbundle')
-        Remove-Item ($global:path + '.\Winget.msixbundle')
+        $global:installer += "Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')`n"
+        $global:installer += "Add-AppxPackage ($global:path + '\WinGet.msixbundle')`n"
+        $global:installer += "Remove-Item ($global:path + '.\Winget.msixbundle')`n`n"
     }
 
     #Random winget cmd used to accept agreements
-    winget search --accept-source-agreements Acc > $null
+    $global:installer += "winget search --accept-source-agreements Acc > `$null`n`n"
 }
 
 
