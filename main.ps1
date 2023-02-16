@@ -262,6 +262,7 @@ function PDF-Menu
     Write-Host "1: Adobe Acrobat"
     Write-Host "2: Nitro Pro"
     Write-Host "3: Foxit PDF"
+    Write-Host "s: Skip"
     Write-Host "q: Quit"
 
 
@@ -270,8 +271,9 @@ function PDF-Menu
     switch -Regex ($selection)
     {
         '1' {$global:installer += "winget install Adobe.Acrobat.Reader.64-bit --scope machine`n";return} 
-        '2' {'You selected Nitro Reader';return} 
+        '2' {$global:installer += "winget install NitroSoftware.NitroPro --scope machine`n";return} 
         '3' {$global:installer += "winget install Foxit.FoxitReader --scope machine`n";return}
+        's' {return}
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; PDF-Menu}
     }
@@ -318,7 +320,7 @@ function Programs-Menu
 
         switch -Regex ($selection)
         {
-            '1' {$global:installer += "winget install Mozilla.Thunderbird --scope machine`n";Programs-Menu ($programsAvailable -ne '1');return}
+            '1' {$global:installer += "winget install Mozilla.Thunderbird`n";Programs-Menu ($programsAvailable -ne '1');return}
             '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n";Programs-Menu ($programsAvailable -ne '2');return}
             '3' {$global:installer += "winget install GIMP.GIMP --scope machine`n";Programs-Menu ($programsAvailable -ne '3');return}
             '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass --scope machine`n";Programs-Menu ($programsAvailable -ne '4');return}
