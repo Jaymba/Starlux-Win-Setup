@@ -284,7 +284,7 @@ function Programs-Menu
 {
     param(
         
-        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7','d')
+        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8','d')
     )
 
 #    switch($programsAvailable){
@@ -299,6 +299,7 @@ function Programs-Menu
         '5' {Write-Host "5: VLC Media Player"}
         '6' {Write-Host "6: Gnucash"}
         '7' {Write-Host "7: Google Earth Pro"}  
+        '8' {Write-Host "8: DreamPlan"}
         'd' {Write-Host "D: Done"}
     }
 
@@ -327,6 +328,8 @@ function Programs-Menu
             '5' {$global:installer += "winget install VideoLAN.VLC --scope machine`n";Programs-Menu ($programsAvailable -ne '5');return}
             '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n";Programs-Menu ($programsAvailable -ne '6');return}
             '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
+            #DreamPlan
+            '8' {$global:installer += "winget install 9NXSX2KDNKMT --scope machine`n";Programs-Menu ($programsAvailable -ne '8');return}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
