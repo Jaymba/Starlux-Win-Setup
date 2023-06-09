@@ -380,6 +380,8 @@ InstallWinget
 
 Update-Windows
 
+$global:installer += ($global:path + "\decrapify.ps1")
+
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
 Invoke-Expression -Command $global:installer
 
