@@ -348,7 +348,7 @@ function Update-Windows
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
     $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install`n" #-AutoReboot
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n" #-AutoReboot
 
 }
 
