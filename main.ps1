@@ -284,7 +284,7 @@ function Programs-Menu
 {
     param(
         
-        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8','9','d')
+        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8','d')
     )
 
 #    switch($programsAvailable){
@@ -300,7 +300,6 @@ function Programs-Menu
         '6' {Write-Host "6: Gnucash"}
         '7' {Write-Host "7: Google Earth Pro"}  
         '8' {Write-Host "8: DreamPlan"}
-        '9' {Write-Host "9: VLC Media Player"}
         'd' {Write-Host "D: Done"}
     }
 
@@ -331,7 +330,6 @@ function Programs-Menu
             '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
             #DreamPlan
             '8' {$global:installer += "winget install 9NXSX2KDNKMT --scope machine`n";Programs-Menu ($programsAvailable -ne '8');return}
-            '9' {$global:installer += "winget install VideoLAN.VLC --scope machine`n";Programs-Menu ($programsAvailable -ne '9');return}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
@@ -382,7 +380,8 @@ InstallWinget
 
 Update-Windows
 
-$global:installer += ($global:path + "\decrapify.ps1")
+$global:installer += ($global:path + "\decrapify.ps1`n")
+$global:installer += ($global:path + "PreinstalledAppsRemoval.ps1`n")
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
 Invoke-Expression -Command $global:installer
