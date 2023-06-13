@@ -14,6 +14,7 @@
 Clear-Host
 
 Set-TimeZone "Eastern Standard Time"
+W32tm /resync /force
 
 if (!
     #current role
