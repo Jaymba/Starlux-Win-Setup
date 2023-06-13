@@ -381,7 +381,7 @@ InstallWinget
 Update-Windows
 
 $global:installer += ($global:path + "\decrapify.ps1`n")
-$global:installer += ($global:path + "PreinstalledAppsRemoval.ps1`n")
+$global:installer += ($global:path + "\PreinstalledAppsRemoval.ps1`n")
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
 Invoke-Expression -Command $global:installer
