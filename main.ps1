@@ -381,9 +381,9 @@ InstallWinget
 
 Update-Windows
 
-$global:installer += "copy " + ($global:path + "\Layout.xml ") + "C:\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayout.xml"
-$global:installer += ($global:path + "\decrapify.ps1`n")
-$global:installer += ($global:path + "\CleanupApps.ps1`n")
+$global:installer += "copy " + ($global:path + "\Layout.xml ") + "C:\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayout.xml`n"
+$global:installer += ("powershell " + $global:path + "\decrapify.ps1`n")
+$global:installer += ("powershell " + $global:path + "\CleanupApps.ps1`n")
 
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
