@@ -14,7 +14,7 @@
 Clear-Host
 
 if((Get-Service -Name W32Time).Status -eq "Stopped"){
-    net start w32tm
+    net start w32time
 }
 
 Set-TimeZone "Eastern Standard Time"
