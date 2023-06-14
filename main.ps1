@@ -13,12 +13,12 @@
 
 Clear-Host
 
+Set-TimeZone "Eastern Standard Time"
+
 if((Get-Service -Name W32Time).Status -eq "Stopped"){
     net start w32time
 }
 
-Set-TimeZone "Eastern Standard Time"
-W32tm /resync /force
 
 if (!
     #current role
