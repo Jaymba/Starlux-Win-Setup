@@ -1068,8 +1068,4 @@ reg add "HKEY_USERS\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Pe
 ##########
 # Restart
 ##########
-Write-Host
-Write-Host "Press any key to restart 
 
-..." -ForegroundColor Black -BackgroundColor White
-$key = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
