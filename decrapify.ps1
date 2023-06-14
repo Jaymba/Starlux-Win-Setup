@@ -970,10 +970,12 @@ net accounts /maxpwage:0
 #Restart Explorer and delete the layout file
 Stop-Process -name explorer
 
+$curFolder = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
+$layoutFile = $curFolder + "\Layout.xml"
 # Uncomment the next line to make clean start menu default for all new users
 Import-StartLayout -LayoutPath $layoutFile -MountPath $env:SystemDrive\
 
-Remove-Item $layoutFile
+#Remove-Item $layoutFile
 
 
 # Prevents SYSPREP from freezing at "Getting Ready" on first boot                          #
