@@ -1,3 +1,6 @@
+Write-OUtput "Starting App Cleanup"
+Start-Sleep -Seconds 2
+
 $goodapps = "communicationsapps|weather|maps|sketch|calculator|stickynotes|alarms|paint|store|edge|photos|extension|vclibs|runtime" #Sets a variable thats used for excluding to-be removed apps
 
 get-appxprovisionedpackage -online |where {$_.displayname -notmatch $goodapps } |select displayname #Just shows you what is going to be removed
