@@ -92,7 +92,8 @@ function CheckDrive{
             
         }
     }else{
-        Break
+        Write-Output "SSD DETECTED"
+        return
     }
 }
 
@@ -358,7 +359,7 @@ function Update-Windows
 }
 
 NetworkTest
-
+CheckDrive
 Change-Power-Settings
 
 #Menu Logic
@@ -383,9 +384,8 @@ Programs-Menu
 
 InstallWinget
 
-$global:installer += "copy " + ($global:path + "\Layout.xml ") + "C:\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayout.xml`n"
-$global:installer += ("powershell " + $global:path + "\decrapify.ps1`n")
-$global:installer += ("powershell " + $global:path + "\CleanupApps.ps1`n")
+$global:installer += ("powershell " + $global:path + "\dependecies\decrapify.ps1`n")
+$global:installer += ("powershell " + $global:path + "\depencecies\CleanupApps.ps1`n")
 
 Update-Windows
 
