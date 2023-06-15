@@ -30,6 +30,8 @@ if((Get-Service -Name W32Time).Status -eq "Stopped"){
     net start w32time
 }
 
+w32tm /resync /force
+
 function Update-Windows
 {
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
