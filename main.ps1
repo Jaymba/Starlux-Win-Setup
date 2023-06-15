@@ -13,11 +13,6 @@
 
 Clear-Host
 
-Set-TimeZone "Eastern Standard Time"
-
-if((Get-Service -Name W32Time).Status -eq "Stopped"){
-    net start w32time
-}
 
 
 if (!
@@ -96,27 +91,7 @@ function CheckDrive{
     }
 }
 
-function Change-Power-Settings
-{
-    powercfg /Change monitor-timeout-ac 10
 
-    powercfg /Change standby-timeout-ac 0
-    
-
-}
-
-function InstallWinget{
-
-    if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
-        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
-        Add-AppxPackage ($global:path + '\WinGet.msixbundle')
-        Remove-Item ($global:path + '\Winget.msixbundle')
-    }
-
-    #Random winget cmd used to accept agreements
-    winget search --accept-source-agreements Acc > $null
-}
 
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
@@ -234,11 +209,7 @@ function Apply-GP
     $global:installer += "`nCopy-Item '$global:path\GP\*' -Destination 'C:\Windows\System32' -Force -Recurse`n`n"
 }
 
-function Install-TV
-{
-    $global:installer += "winget install TeamViewer.TeamViewer.Host --scope machine`n"
 
-}
 
 
 #Discarded in favor of installing TV Host without prompt
@@ -348,18 +319,10 @@ function Programs-Menu
 
 }
 
-function Update-Windows
-{
-    $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
-    $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n" #-AutoReboot
-
-}
 
 NetworkTest
 
-Change-Power-Settings
 
 #Menu Logic
 
@@ -367,7 +330,6 @@ Rename-Menu
 User-Menu
 
 
-Install-TV
 
 GP-Menu
 PDF-Menu
@@ -380,14 +342,6 @@ Programs-Menu
 ##Exit-PSSession
 #"@
 
-
-InstallWinget
-
-$global:installer += "copy " + ($global:path + "\Layout.xml ") + "C:\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayout.xml`n"
-$global:installer += ("powershell " + $global:path + "\decrapify.ps1`n")
-$global:installer += ("powershell " + $global:path + "\CleanupApps.ps1`n")
-
-Update-Windows
 
 
 Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
