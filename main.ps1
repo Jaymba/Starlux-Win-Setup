@@ -100,7 +100,7 @@ function Change-Power-Settings
 {
     powercfg /Change monitor-timeout-ac 10
 
-    powercfg /Change standby-timeout-ac 120
+    powercfg /Change standby-timeout-ac 0
     
 
 }
