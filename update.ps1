@@ -123,8 +123,8 @@ Install-TV
 
 InstallWinget
 
-powershell $global:path + "\dependencies\decrapify.ps1"
-powershell $global:path + "\dependencies\CleanupApps.ps1"
+powershell ($global:path + "\dependencies\decrapify.ps1")
+powershell ($global:path + "\dependencies\CleanupApps.ps1")
 
 
 Update-Windows
