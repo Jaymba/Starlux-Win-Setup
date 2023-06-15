@@ -108,7 +108,7 @@ function CheckDrive{
             
         }
     }else{
-        Break
+        return
     }
 }
 
