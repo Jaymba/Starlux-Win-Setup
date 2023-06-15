@@ -74,6 +74,7 @@ function NetworkTest{
         if(-Not (Test-Connection -ComputerName 1.1.1.1 -Quiet -ErrorAction SilentlyContinue)){
             "Error: Please check your internet connection"
         }else{
+            Write-Output "SSD DETECTED"
             return
         }
 
