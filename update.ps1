@@ -108,7 +108,6 @@ function CheckDrive{
             'y'{return}
             'n'{exit}
             '^*'{'Invalid Option';CheckDrive}
-            
         }
     }else{
         return
@@ -119,12 +118,10 @@ CheckDrive
 NetworkTest
 Change-Power-Settings
 
-Install-TV
-
-InstallWinget
-
 powershell ($global:path + "\dependencies\decrapify.ps1")
 powershell ($global:path + "\dependencies\CleanupApps.ps1")
 
+InstallWinget
+Install-TV
 
 Update-Windows
