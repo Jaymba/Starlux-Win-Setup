@@ -13,6 +13,8 @@
 
 Clear-Host
 
+net accounts /maxpwage:unlimited #Set new user passwords to never expire
+
 Set-TimeZone "Eastern Standard Time"
 
 if((Get-Service -Name W32Time).Status -eq "Stopped"){
@@ -185,7 +187,7 @@ function Create-User
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
     Set-Admin $NewName
-
+    Set-PasswordNeverExpires $NewName
 }
 
 function Set-Admin
@@ -203,6 +205,20 @@ function Set-Admin
     }
 }    
 
+function Set-PasswordNeverExpires
+{
+    param(
+	[string] $Name
+    )
+    $global:installer += "Set-LocalUser -PasswordNeverExpires 1 -Name $Name" + "`n" #Do without asking
+    #$passwordsetting = Read-Host "`nShould the User's password expire?`nType: Y(Yes) or N(No)"
+#
+#    switch -Regex ($passwordsetting){
+#	'y' {return}
+#	'n' { $global:installer += "Set-LocalUser -PasswordNeverExpires 1 -Name " + $Name + "`n";return}
+#	'^*'{"Error: Unrecognized Option."; Set-PasswordNeverExpires $name}
+#    }
+} 
 
 
 function GP-Menu
