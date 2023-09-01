@@ -13,8 +13,6 @@
 
 Clear-Host
 
-net accounts /maxpwage:unlimited #Set new user passwords to never expire
-
 Set-TimeZone "Eastern Standard Time"
 
 if((Get-Service -Name W32Time).Status -eq "Stopped"){
