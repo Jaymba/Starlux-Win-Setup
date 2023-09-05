@@ -19,6 +19,13 @@ if((Get-Service -Name W32Time).Status -eq "Stopped"){
     net start w32time
 }
 
+if(-Not (Get-Command pwsh -errorAction SilentlyContinue)){ #run PWSH if already installed, if not, run Windows Powershell
+        $global:PScommand = "powershell"
+    }
+    else
+    {
+        $global:PScommand = "pwsh"
+    }
 
 if (!
     #current role
@@ -31,7 +38,7 @@ if (!
 ) {
     #elevate script and exit current non-elevated runtime
     Start-Process `
-        -FilePath 'powershell' `
+        -FilePath $global:PScommand `
         -ArgumentList (
             #flatten to single array
             '-File', $MyInvocation.MyCommand.Source, $args `
@@ -45,7 +52,21 @@ $global:installer = ""
 $global:username = ""
 $global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
 
+function RunPWSH($MyInvocation, $args){
 
+    if($PSVersionTable.PSEdition -eq "Desktop"){
+
+     Start-Process `
+       -FilePath 'pwsh' `
+       -ArgumentList (
+           #flatten to single array
+           '-File', $MyInvocation.MyCommand.Source, $args `
+           | %{ $_ }
+       ) `
+       -Verb RunAs
+     exit
+  }
+}
 
 function NetworkTest{
 
@@ -119,6 +140,12 @@ function InstallWinget{
     winget search --accept-source-agreements Acc > $null
 }
 
+function InstallPWSH
+{
+    if(-Not (Get-Command pwsh -errorAction SilentlyContinue)){
+        winget install --id Microsoft.Powershell --source winget
+    }
+}
 
 #Append strings to the end of the installer. At the end run installer with Invoke-Expression
 $global:installer = ""
@@ -326,7 +353,7 @@ function Programs-Menu
     $selection = Read-Host "`nEnter your selection"
     
 #    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
-    if(-Not ($programsAvailable.Contains($selection))){
+    if(-Not ($programsAvailable.Contains($selection, 'InvariantCultureIgnoreCase'))){
         
         if(($selection -gt 0) -or ($selection -lt 8))
         {
@@ -376,11 +403,14 @@ NetworkTest
 CheckDrive
 Change-Power-Settings
 
+InstallWinget
+InstallPWSH
+RunPWSH $MyInvocation $args
+
 #Menu Logic
 
 Rename-Menu
 User-Menu
-
 
 Install-TV
 
@@ -396,7 +426,6 @@ Programs-Menu
 #"@
 
 
-InstallWinget
 
 $global:installer += ("powershell " + $global:path + "\dependecies\decrapify.ps1`n")
 $global:installer += ("powershell " + $global:path + "\depencecies\CleanupApps.ps1`n")
