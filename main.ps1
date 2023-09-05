@@ -353,14 +353,12 @@ function Programs-Menu
     $selection = Read-Host "`nEnter your selection"
     
 #    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
-    if(-Not ($programsAvailable.Contains($selection.ToLower()))){
+    if(-Not ($programsAvailable.Contains($selection, 'InvariantCultureIgnoreCase'))){
         
         if(($selection -gt 0) -or ($selection -lt 8))
         {
             "ERROR: Option has already been selected."
-	    $env:selection
             Programs-Menu $programsAvailable
-
         }else{
             Write-Output "ERROR: Unrecognized Option"
             Programs-Menu $programsAvailable
@@ -429,8 +427,8 @@ Programs-Menu
 
 
 
-$global:installer += ("powershell " + $global:path + "\dependencies\decrapify.ps1`n")
-$global:installer += ("powershell " + $global:path + "\depencencies\CleanupApps.ps1`n")
+$global:installer += ("powershell " + $global:path + "\dependecies\decrapify.ps1`n")
+$global:installer += ("powershell " + $global:path + "\depencecies\CleanupApps.ps1`n")
 
 Update-Windows
 
