@@ -129,8 +129,14 @@ function Change-Power-Settings
 
 function InstallWinget{
 
+   
     if(-Not (Get-Command winget -errorAction SilentlyContinue)){
-        Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+
+        if($PSVersionTable.PSEdition -eq "Core"){
+	     Import-Module Appx -UseWindowsPowerShell #just in case winget install tries to run on PS Core
+        }
+        
+	Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
         Add-AppxPackage ($global:path + '\WinGet.msixbundle')
         Remove-Item ($global:path + '\Winget.msixbundle')
@@ -401,25 +407,99 @@ function Update-Windows
 
 }
 
-NetworkTest
-CheckDrive
-Change-Power-Settings
+function RunInit
+{
+    param(
+	[bool] $PostInit,
+	[string]$Title = 'Running initial setup'
+    )
 
-InstallWinget
-InstallPWSH
-RunPWSH $MyInvocation $args
+    if($PostInit -eq 0)
+    {
+	Write-Host 'Init will now run. Next run of this script will automatically run Post-Init. If you do not want this behavior, delete the "Inithasrun" file'
+	Start-Sleep 5
+	[void](New-Item ($global:path + "\InitialSetupDone"))
+    }
 
-#Menu Logic
+    Install-TV 
+    $global:installer += ("powershell " + $global:path + "\dependencies\decrapify.ps1`n") 
+    $global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n") 
 
-Rename-Menu
-User-Menu
+    Update-Windows 
 
-Install-TV
+    Set-Content -Path ($global:path + "\1-init-installer.ps1") -Value $global:installer 
+    Invoke-Expression -Command $global:installer 
+   
 
-GP-Menu
-PDF-Menu
+}
 
-Programs-Menu
+function RunPostInit
+{
+    param(
+#	[bool] $WinUpdate,
+        [string]$Title = 'Running post-init setup'
+    )
+    #Menu Logic
+
+    Rename-Menu 
+    User-Menu 
+
+
+    GP-Menu 
+    PDF-Menu 
+
+    Programs-Menu 
+
+#    if($WinUpdate -eq 1)
+#    {
+#	Update-Windows 
+#    }
+
+    Set-Content -Path ($global:path + "\2-postinit-installer.ps1") -Value $global:installer 
+    Invoke-Expression -Command $global:installer 
+
+}
+
+function Script-Menu
+{
+    param(
+        [string]$Title = 'Select the type of setup you would like to run'
+    )
+
+    Write-Host "`n=========================$Title==========================="
+
+    Write-Host "1: Initial Install"
+    Write-Host "2: Full Setup"
+    Write-Host "q: Quit"
+
+
+    $selection = Read-Host "Enter your selection"
+
+    switch -Regex ($selection)
+    {
+        '1' {RunInit 0; return} #run init with special text
+        '2' {RunPostInit; RunInit 1; return} #run Post Init and Init without special text
+        'q' {exit}
+        '^*' {"`nERROR: Unrecognized Option`n"; Script-Menu}
+    }
+}
+
+NetworkTest 
+CheckDrive 
+Change-Power-Settings 
+
+InstallWinget 
+InstallPWSH 
+RunPWSH $MyInvocation $args 
+
+if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
+{
+    RunPostInit
+}
+else
+{
+    Script-Menu
+}
 
 #$global:installer += @"
 ##Enter-PSSession -ComputerName localhost -Credential $global:username`n
@@ -428,15 +508,6 @@ Programs-Menu
 #"@
 
 
-
-$global:installer += ("powershell " + $global:path + "\dependencies\decrapify.ps1`n")
-$global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n")
-
-Update-Windows
-
-
-Set-Content -Path ($global:path + "\installer.ps1") -Value $global:installer
-Invoke-Expression -Command $global:installer
 
 #uninstall winget
 #winget uninstall Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
