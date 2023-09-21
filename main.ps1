@@ -41,6 +41,7 @@ if (!
         -FilePath $global:PScommand `
         -ArgumentList (
             #flatten to single array
+	    '-ExecutionPolicy Bypass',
             '-File', $MyInvocation.MyCommand.Source, $args `
             | %{ $_ }
         ) `
@@ -60,6 +61,7 @@ function RunPWSH($MyInvocation, $args){
        -FilePath 'pwsh' `
        -ArgumentList (
            #flatten to single array
+	   '-ExecutionPolicy Bypass',
            '-File', $MyInvocation.MyCommand.Source, $args `
            | %{ $_ }
        ) `
@@ -136,7 +138,7 @@ function InstallWinget{
 	     Import-Module Appx -UseWindowsPowerShell #just in case winget install tries to run on PS Core
         }
         
-	if((Get-AppxPackage -name 'Microsoft.VCLibs.140.00.UWPDesktop').Version -lt 14.0.30704.0){ #check if minimum version of VCLibs is not available
+	if((Get-AppxPackage -name 'Microsoft.VCLibs.140.00.UWPDesktop').Version -ne 14.0.30704.0){ #check if version is not the required version
 	     Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
 	}
 
