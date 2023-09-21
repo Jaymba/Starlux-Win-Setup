@@ -1,7 +1,1 @@
-Open powershell as admin
-
-Run: Set-ExecutionPolicy Bypass
-Enter A to AcceptAll
-
-
 Right click main.ps1 and select "Open with Powershell"
