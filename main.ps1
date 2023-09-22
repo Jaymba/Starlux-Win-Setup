@@ -144,7 +144,7 @@ function InstallWinget{
 
 	if((Get-AppxPackage -name 'Microsoft.UI.Xaml.2.7*') -eq $null){ #check if any version of Microsoft.UI.Xaml.2.7 exists
 	     Invoke-WebRequest -Uri 'https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3' -OutFile ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
-	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
+	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip') -DestinationPath ($global:path + '\Microsoft.UI.Xaml.2.7.3')
 	     Add-AppxPackage ($global:path + '\Microsoft.UI.Xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx')
              Remove-Item ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
              Remove-Item -Recurse ($global:path + '\Microsoft.UI.Xaml.2.7.3')
