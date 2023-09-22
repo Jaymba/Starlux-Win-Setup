@@ -41,6 +41,7 @@ if (!
         -FilePath $global:PScommand `
         -ArgumentList (
             #flatten to single array
+	    '-ExecutionPolicy Bypass',
             '-File', $MyInvocation.MyCommand.Source, $args `
             | %{ $_ }
         ) `
@@ -60,6 +61,7 @@ function RunPWSH($MyInvocation, $args){
        -FilePath 'pwsh' `
        -ArgumentList (
            #flatten to single array
+	   '-ExecutionPolicy Bypass',
            '-File', $MyInvocation.MyCommand.Source, $args `
            | %{ $_ }
        ) `
@@ -136,8 +138,20 @@ function InstallWinget{
 	     Import-Module Appx -UseWindowsPowerShell #just in case winget install tries to run on PS Core
         }
         
-	Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
-        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/download/v1.1.12653/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
+	if((Get-AppxPackage -name 'Microsoft.VCLibs.140.00.UWPDesktop').Version -ne 14.0.30704.0){ #check if version is not the required version
+	     Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+	}
+
+	if((Get-AppxPackage -name 'Microsoft.UI.Xaml.2.7*') -eq $null){ #check if any version of Microsoft.UI.Xaml.2.7 exists
+	     Invoke-WebRequest -Uri 'https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3' -OutFile ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
+	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip') -DestinationPath ($global:path + '\Microsoft.UI.Xaml.2.7.3')
+	     Add-AppxPackage ($global:path + '\Microsoft.UI.Xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx')
+             Remove-Item ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
+             Remove-Item -Recurse ($global:path + '\Microsoft.UI.Xaml.2.7.3')
+	}
+
+
+        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
         Add-AppxPackage ($global:path + '\WinGet.msixbundle')
         Remove-Item ($global:path + '\Winget.msixbundle')
     }
