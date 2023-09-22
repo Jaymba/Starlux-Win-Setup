@@ -412,6 +412,11 @@ function Programs-Menu
 
 }
 
+function Reset-UserExecutionPolicy
+{
+    "Set-ExecutionPolicy -Scope CurrentUser Undefined"
+}
+
 function Update-Windows
 {
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
@@ -492,7 +497,7 @@ function Script-Menu
     switch -Regex ($selection)
     {
         '1' {RunInit 0; return} #run init with special text
-        '2' {RunPostInit; RunInit 1; return} #run Post Init and Init without special text
+        '2' {RunPostInit; RunInit 1; Reset-UserExectutionPolicy; return} #run Post Init and Init without special text
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; Script-Menu}
     }
@@ -509,6 +514,7 @@ RunPWSH $MyInvocation $args
 if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
 {
     RunPostInit
+    Reset-UserExectutionPolicy
 }
 else
 {
