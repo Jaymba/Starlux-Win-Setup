@@ -228,7 +228,7 @@ function Create-User
 
 
     switch -Regex ($confirm){
-        'y'{ $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
+        'y'{ $global:installer += "Import-Module Microsoft.Powershell.LocalAccounts -UseWindowsPowerShell`n"; $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
         'n'{User-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
@@ -415,6 +415,7 @@ function Programs-Menu
 function Reset-UserExecutionPolicy
 {
     "Set-ExecutionPolicy -Scope CurrentUser Undefined"
+    "Set-ExecutionPolicy -Scope LocalMachine Undefined"
 }
 
 function Update-Windows
@@ -435,9 +436,13 @@ function RunInit
 
     if($PostInit -eq 0)
     {
-	Write-Host 'Init will now run. Next run of this script will automatically run Post-Init. If you do not want this behavior, delete the "Inithasrun" file'
+	Write-Host 'Init will now run. Next run of this script will automatically run Post-Init. If you do not want this behavior, delete the "InitialSetupDone" file'
 	Start-Sleep 5
 	[void](New-Item ($global:path + "\InitialSetupDone"))
+    }
+    else
+    {
+	$global:installer = ""
     }
 
     Install-TV 
