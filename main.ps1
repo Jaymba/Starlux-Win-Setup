@@ -416,6 +416,13 @@ function Programs-Menu
 
 }
 
+function Import-StartMenuOptions
+{
+   $global:installer += "New-Item -ItemType Directory -Path C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState -ErrorAction SilentlyContinue`n"
+   $global:installer += ("Copy-Item -Path " + $global:path + "\dependencies\start2.bin -Destination C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
+   $global:installer += ("Copy-Item -Force -Path " + $global:path + "\dependencies\start2.bin -Destination " + $env:UserProfile + "\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
+}
+
 function Reset-UserExecutionPolicy
 {
     "Set-ExecutionPolicy -Scope CurrentUser Undefined"
@@ -451,7 +458,8 @@ function RunInit
 
     Install-TV 
     $global:installer += ("powershell " + $global:path + "\dependencies\decrapify.ps1`n") 
-    $global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n") 
+    $global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n")
+    Import-StartMenuOptions
 
     Update-Windows 
 
