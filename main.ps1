@@ -167,7 +167,7 @@ function InstallWinget{
 function InstallPWSH
 {
     if(-Not (Get-Command pwsh -errorAction SilentlyContinue)){
-        winget install --id Microsoft.Powershell --source winget
+        winget install --id 9MZ1SNWT0N5D --source msstore --accept-source-agreements --accept-package-agreements
     }
 }
 
@@ -418,9 +418,10 @@ function Programs-Menu
 
 function Import-StartMenuOptions
 {
-   $global:installer += "New-Item -ItemType Directory -Path C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState -ErrorAction SilentlyContinue`n"
+   $global:installer += "`nNew-Item -ItemType Directory -Path C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState -ErrorAction SilentlyContinue`n"
    $global:installer += ("Copy-Item -Path " + $global:path + "\dependencies\start2.bin -Destination C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
    $global:installer += ("Copy-Item -Force -Path " + $global:path + "\dependencies\start2.bin -Destination " + $env:UserProfile + "\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
+   $global:installer += "Stop-Process -Name StartMenuExperienceHost -Force`n"
 }
 
 function Reset-UserExecutionPolicy
@@ -463,6 +464,7 @@ function RunInit
 
     Update-Windows 
 
+    InstallWinget
     Set-Content -Path ($global:path + "\1-init-installer.ps1") -Value $global:installer 
     Invoke-Expression -Command $global:installer 
    
@@ -491,6 +493,7 @@ function RunPostInit
 #	Update-Windows 
 #    }
 
+    InstallWinget
     Set-Content -Path ($global:path + "\2-postinit-installer.ps1") -Value $global:installer 
     Invoke-Expression -Command $global:installer 
 
@@ -524,7 +527,7 @@ NetworkTest
 CheckDrive 
 Change-Power-Settings 
 
-InstallWinget 
+#InstallWinget 
 InstallPWSH 
 RunPWSH $MyInvocation $args 
 
