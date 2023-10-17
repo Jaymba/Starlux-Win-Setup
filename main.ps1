@@ -232,7 +232,7 @@ function Create-User
 
 
     switch -Regex ($confirm){
-        'y'{ $global:installer += "Import-Module Microsoft.Powershell.LocalAccounts -UseWindowsPowerShell`n"; $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
+        'y'{ $global:installer += "`n" + 'if($PSVersionTable.PSEdition -eq "Core"){Import-Module Microsoft.Powershell.LocalAccounts -UseWindowsPowerShell}'; $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
         'n'{User-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
@@ -465,6 +465,7 @@ function RunInit
     Update-Windows 
 
     InstallWinget
+    InstallPWSH
     Set-Content -Path ($global:path + "\1-init-installer.ps1") -Value $global:installer 
     Invoke-Expression -Command $global:installer 
    
@@ -528,8 +529,9 @@ CheckDrive
 Change-Power-Settings 
 
 #InstallWinget 
-InstallPWSH 
-RunPWSH $MyInvocation $args 
+#InstallPWSH 
+#RunPWSH $MyInvocation $args 
+# uncomment above lines to install and run PWSH before script is used
 
 if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
 {
