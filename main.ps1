@@ -132,17 +132,21 @@ function Change-Power-Settings
 function InstallWinget{
 
    
-    if(-Not (Get-Command winget -errorAction SilentlyContinue)){
+    if(-Not (Get-Command winget -errorAction SilentlyContinue) -or -Not ((winget -v).TrimStart('v') -ge '1.3')){ #if winget is not found or not new enough version
 
         if($PSVersionTable.PSEdition -eq "Core"){
 	     Import-Module Appx -UseWindowsPowerShell #just in case winget install tries to run on PS Core
         }
-        
-	if((Get-AppxPackage -name 'Microsoft.VCLibs.140.00.UWPDesktop').Version -ne 14.0.30704.0){ #check if version is not the required version
+
+	$ProgressPreference = 'SilentlyContinue' # should speed up downloads on Windows Powershell
+
+	if((Get-AppxPackage -name 'Microsoft.VCLibs.140.00.UWPDesktop').Version.TrimStart('14.0.') -lt 30704){ #check if less than minimum version
+	     Write-Host 'Installing VCLibs'
 	     Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
 	}
 
 	if((Get-AppxPackage -name 'Microsoft.UI.Xaml.2.7*') -eq $null){ #check if any version of Microsoft.UI.Xaml.2.7 exists
+	     Write-Host 'Installing Microsoft.UI.Xaml'
 	     Invoke-WebRequest -Uri 'https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3' -OutFile ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
 	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip') -DestinationPath ($global:path + '\Microsoft.UI.Xaml.2.7.3')
 	     Add-AppxPackage ($global:path + '\Microsoft.UI.Xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx')
@@ -150,7 +154,7 @@ function InstallWinget{
              Remove-Item -Recurse ($global:path + '\Microsoft.UI.Xaml.2.7.3')
 	}
 
-
+	Write-Host 'Installing WinGet'
         Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
         Add-AppxPackage ($global:path + '\WinGet.msixbundle')
         Remove-Item ($global:path + '\Winget.msixbundle')
@@ -163,7 +167,7 @@ function InstallWinget{
 function InstallPWSH
 {
     if(-Not (Get-Command pwsh -errorAction SilentlyContinue)){
-        winget install --id Microsoft.Powershell --source winget
+        winget install --id 9MZ1SNWT0N5D --source msstore --accept-source-agreements --accept-package-agreements
     }
 }
 
@@ -228,7 +232,7 @@ function Create-User
 
 
     switch -Regex ($confirm){
-        'y'{ $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
+        'y'{ $global:installer += "`n" + 'if($PSVersionTable.PSEdition -eq "Core"){Import-Module Microsoft.Powershell.LocalAccounts -UseWindowsPowerShell}'; $global:installer += "`nNew-LocalUser -Name " + $NewName + " -NoPassword`n";break}
         'n'{User-Menu;return}
         '^*'{'ERROR: Unrecognized Option';Create-User}
     }
@@ -412,6 +416,20 @@ function Programs-Menu
 
 }
 
+function Import-StartMenuOptions
+{
+   $global:installer += "`nNew-Item -ItemType Directory -Path C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState -ErrorAction SilentlyContinue`n"
+   $global:installer += ("Copy-Item -Path " + $global:path + "\dependencies\start2.bin -Destination C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
+   $global:installer += ("Copy-Item -Force -Path " + $global:path + "\dependencies\start2.bin -Destination " + $env:UserProfile + "\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState`n")
+   $global:installer += "Stop-Process -Name StartMenuExperienceHost -Force`n"
+}
+
+function Reset-UserExecutionPolicy
+{
+    "Set-ExecutionPolicy -Scope CurrentUser Undefined"
+    "Set-ExecutionPolicy -Scope LocalMachine Undefined"
+}
+
 function Update-Windows
 {
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
@@ -430,17 +448,24 @@ function RunInit
 
     if($PostInit -eq 0)
     {
-	Write-Host 'Init will now run. Next run of this script will automatically run Post-Init. If you do not want this behavior, delete the "Inithasrun" file'
+	Write-Host 'Init will now run. Next run of this script will automatically run Post-Init. If you do not want this behavior, delete the "InitialSetupDone" file'
 	Start-Sleep 5
 	[void](New-Item ($global:path + "\InitialSetupDone"))
+    }
+    else
+    {
+	$global:installer = ""
     }
 
     Install-TV 
     $global:installer += ("powershell " + $global:path + "\dependencies\decrapify.ps1`n") 
-    $global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n") 
+    $global:installer += ("powershell " + $global:path + "\dependencies\CleanupApps.ps1`n")
+    Import-StartMenuOptions
 
     Update-Windows 
 
+    InstallWinget
+    InstallPWSH
     Set-Content -Path ($global:path + "\1-init-installer.ps1") -Value $global:installer 
     Invoke-Expression -Command $global:installer 
    
@@ -469,6 +494,7 @@ function RunPostInit
 #	Update-Windows 
 #    }
 
+    InstallWinget
     Set-Content -Path ($global:path + "\2-postinit-installer.ps1") -Value $global:installer 
     Invoke-Expression -Command $global:installer 
 
@@ -492,7 +518,7 @@ function Script-Menu
     switch -Regex ($selection)
     {
         '1' {RunInit 0; return} #run init with special text
-        '2' {RunPostInit; RunInit 1; return} #run Post Init and Init without special text
+        '2' {RunPostInit; RunInit 1; Reset-UserExectutionPolicy; return} #run Post Init and Init without special text
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; Script-Menu}
     }
@@ -502,13 +528,15 @@ NetworkTest
 CheckDrive 
 Change-Power-Settings 
 
-InstallWinget 
-InstallPWSH 
-RunPWSH $MyInvocation $args 
+#InstallWinget 
+#InstallPWSH 
+#RunPWSH $MyInvocation $args 
+# uncomment above lines to install and run PWSH before script is used
 
 if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
 {
     RunPostInit
+    Reset-UserExectutionPolicy
 }
 else
 {

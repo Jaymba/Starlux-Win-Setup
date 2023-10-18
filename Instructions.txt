@@ -1,1 +1,6 @@
+Run start.bat
+
+Alternative method below
+
+Open a normal Powershell window and run "Set-ExecutionPolicy -Scope CurrentUser bypass"
 Right click main.ps1 and select "Open with Powershell"
