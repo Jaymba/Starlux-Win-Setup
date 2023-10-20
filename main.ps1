@@ -122,12 +122,21 @@ function CheckDrive{
 
 function Change-Power-Settings
 {
+    param(
+        [switch]$NoStandby
+    )
+
     powercfg /Change monitor-timeout-ac 10
 
-    powercfg /Change standby-timeout-ac 120
-    
+    if($NoStandby){
+	powercfg /Change standby-timeout-ac 0
+    }
+    else{
+        powercfg /Change standby-timeout-ac 120
+    }
 
 }
+
 
 function InstallWinget{
 
@@ -435,7 +444,9 @@ function Update-Windows
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
     $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n" #-AutoReboot
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install`n" #-AutoReboot
+    $global:installer += "Change-Power-Settings`n"
+    $global:installer += "Restart-Computer -Force`n"
 
 }
 
@@ -526,7 +537,7 @@ function Script-Menu
 
 NetworkTest 
 CheckDrive 
-Change-Power-Settings 
+Change-Power-Settings -NoStandby
 
 #InstallWinget 
 #InstallPWSH 
@@ -537,6 +548,7 @@ if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file 
 {
     RunPostInit
     Reset-UserExectutionPolicy
+    Change-Power-Settings
 }
 else
 {
