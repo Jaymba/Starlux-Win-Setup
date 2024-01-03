@@ -52,7 +52,8 @@ if (!
 $global:installer = ""
 $global:username = ""
 $global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
-
+$global:QCADversion = "3.28.2"
+$global:QCADDLLs = 'qcaddwg.dll','qcadpdf.dll','qcadpolygon.dll','qcadproj.dll','qcadproscripts.dll','qcadshp.dll','qcadtrace.dll','qcadtriangulation.dll','qcadspatialindexpro.dll'
 function RunPWSH($MyInvocation, $args){
 
     if($PSVersionTable.PSEdition -eq "Desktop"){
@@ -309,6 +310,28 @@ function Apply-GP
     $global:installer += "`nCopy-Item '$global:path\GP\*' -Destination 'C:\Windows\System32' -Force -Recurse`n`n"
 }
 
+function Install-QCAD
+{
+    $global:installer += "Invoke-WebRequest -Uri https://www.qcad.org/archives/qcad/qcad-" + $global:QCADversion + "-trial-win64-installer.msi -OutFile " + $global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi`n"
+    $global:installer += "Start-Process msiexec.exe -Wait -ArgumentList '/I " + $global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi" + " /quiet'`n"
+    
+    $global:installer += 'Remove-Item ($global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi")' + "`n"
+    
+    $global:installer += 'foreach ($QCADDLL in $global:QCADDLLs)
+    {
+	if(Test-Path "C:\Program Files\QCAD\plugins\$QCADDLL") {
+	   Remove-Item "C:\Program Files\QCAD\plugins\$QCADDLL"
+	}
+    }' + "`n"
+
+    
+    $global:installer += 'if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
+    {
+	New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
+    }' + "`n"
+    $global:installer += "Invoke-WebRequest -Uri 'https://qcad.org/qcad/book/qcad_book_preview_en.pdf' -OutFile " + '"C:\Users\Public\Desktop\Manuals and Instructions\' + 'qcad_book_preview_en.pdf"'
+}
+
 function Install-TV
 {
     $global:installer += "winget install TeamViewer.TeamViewer.Host --scope machine`n"
@@ -364,7 +387,7 @@ function Programs-Menu
 {
     param(
         
-        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8','d')
+        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8', '9','d')
     )
 
 #    switch($programsAvailable){
@@ -380,6 +403,7 @@ function Programs-Menu
         '6' {Write-Host "6: Gnucash"}
         '7' {Write-Host "7: Google Earth Pro"}  
         '8' {Write-Host "8: DreamPlan"}
+	'9' {Write-Host "9: QCAD Community"}
         'd' {Write-Host "D: Done"}
     }
 
@@ -388,7 +412,7 @@ function Programs-Menu
 #    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
     if(-Not ($programsAvailable.Contains($selection.ToLower()))){
         
-        if(($selection -gt 0) -or ($selection -lt 8))
+        if(($selection -gt 0) -or ($selection -lt 9))
         {
             "ERROR: Option has already been selected."
 	    $env:selection
@@ -412,6 +436,7 @@ function Programs-Menu
             '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
             #DreamPlan
             '8' {$global:installer += "winget install 9NXSX2KDNKMT --scope machine`n";Programs-Menu ($programsAvailable -ne '8');return}
+	    '9' {Install-QCAD;Programs-Menu ($programsAvailable -ne '9');return}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
@@ -435,8 +460,8 @@ function Import-StartMenuOptions
 
 function Reset-UserExecutionPolicy
 {
-    "Set-ExecutionPolicy -Scope CurrentUser Undefined"
-    "Set-ExecutionPolicy -Scope LocalMachine Undefined"
+    Set-ExecutionPolicy -Scope CurrentUser Undefined
+    Set-ExecutionPolicy -Scope LocalMachine Undefined
 }
 
 function Update-Windows
@@ -529,7 +554,7 @@ function Script-Menu
     switch -Regex ($selection)
     {
         '1' {RunInit 0; return} #run init with special text
-        '2' {RunPostInit; RunInit 1; Reset-UserExectutionPolicy; return} #run Post Init and Init without special text
+        '2' {RunPostInit; RunInit 1; Reset-UserExecutionPolicy; return} #run Post Init and Init without special text
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; Script-Menu}
     }
@@ -547,7 +572,7 @@ Change-Power-Settings -NoStandby
 if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
 {
     RunPostInit
-    Reset-UserExectutionPolicy
+    Reset-UserExecutionPolicy
     Change-Power-Settings
 }
 else
