@@ -310,6 +310,21 @@ function Apply-GP
     $global:installer += "`nCopy-Item '$global:path\GP\*' -Destination 'C:\Windows\System32' -Force -Recurse`n`n"
 }
 
+function Download-Manual
+{
+    param(
+        [string]$Link,
+        [string]$Filename
+    )
+
+    if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
+    {
+        New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
+    }
+
+    Invoke-WebRequest -Uri $Link -OutFile "C:\Users\Public\Desktop\Manuals and Instructions\$Filename"
+}
+
 function Install-QCAD
 {
     $global:installer += "Invoke-WebRequest -Uri https://www.qcad.org/archives/qcad/qcad-" + $global:QCADversion + "-trial-win64-installer.msi -OutFile " + $global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi`n"
@@ -324,12 +339,21 @@ function Install-QCAD
 	}
     }' + "`n"
 
-    
-    $global:installer += 'if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
-    {
-	New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
-    }' + "`n"
-    $global:installer += "Invoke-WebRequest -Uri 'https://qcad.org/qcad/book/qcad_book_preview_en.pdf' -OutFile " + '"C:\Users\Public\Desktop\Manuals and Instructions\' + 'qcad_book_preview_en.pdf"'
+     $global:installer += 'Download-Manual -Link "https://qcad.org/doc/qcad/latest/reference/en/qcad_reference_manual_en.pdf" -Filename "qcad_reference_manual_en.pdf"' + "`n"
+#    $global:installer += 'if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
+#    {
+#	New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
+#    }' + "`n"
+#    $global:installer += "Invoke-WebRequest -Uri 'https://qcad.org/qcad/book/qcad_book_preview_en.pdf' -OutFile " + '"C:\Users\Public\Desktop\Manuals and Instructions\' + 'qcad_book_preview_en.pdf"'
+}
+
+function Libreoffice-Docs
+{
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/CG7.6/CG76-CalcGuide.pdf' -Filename 'CG76-CalcGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/DG7.6/DG76-DrawGuide.pdf' -Filename 'DG76-DrawGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/IG7.6/IG76-CalcGuide.pdf' -Filename 'IG76-ImpressGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/WG7.6/WG76-WriterGuide.pdf' -Filename 'WG76-WriterGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/GS7.5/GS75-GettingStarted.pdf' -Filename 'GS75-GettingStarted.pdf'
 }
 
 function Install-TV
@@ -428,11 +452,11 @@ function Programs-Menu
         switch -Regex ($selection)
         {
             '1' {$global:installer += "winget install Mozilla.Thunderbird`n";Programs-Menu ($programsAvailable -ne '1');return}
-            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n";Programs-Menu ($programsAvailable -ne '2');return}
+            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n" + "Libreoffice-Docs`n";Programs-Menu ($programsAvailable -ne '2');return}
             '3' {$global:installer += "winget install GIMP.GIMP --scope machine`n";Programs-Menu ($programsAvailable -ne '3');return}
             '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass --scope machine`n";Programs-Menu ($programsAvailable -ne '4');return}
             '5' {$global:installer += "winget install VideoLAN.VLC --scope machine`n";Programs-Menu ($programsAvailable -ne '5');return}
-            '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n";Programs-Menu ($programsAvailable -ne '6');return}
+            '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n" + "Download-Manual -Link 'https://code.gnucash.org/docs/C/gnucash-guide.pdf' -Filename 'gnucash-guide.pdf'`n";Programs-Menu ($programsAvailable -ne '6');return}
             '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
             #DreamPlan
             '8' {$global:installer += "winget install 9NXSX2KDNKMT --scope machine`n";Programs-Menu ($programsAvailable -ne '8');return}
