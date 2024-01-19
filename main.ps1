@@ -52,7 +52,8 @@ if (!
 $global:installer = ""
 $global:username = ""
 $global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
-
+$global:QCADversion = "3.28.2"
+$global:QCADDLLs = 'qcaddwg.dll','qcadpdf.dll','qcadpolygon.dll','qcadproj.dll','qcadproscripts.dll','qcadshp.dll','qcadtrace.dll','qcadtriangulation.dll','qcadspatialindexpro.dll'
 function RunPWSH($MyInvocation, $args){
 
     if($PSVersionTable.PSEdition -eq "Desktop"){
@@ -122,12 +123,21 @@ function CheckDrive{
 
 function Change-Power-Settings
 {
+    param(
+        [switch]$NoStandby
+    )
+
     powercfg /Change monitor-timeout-ac 10
 
-    powercfg /Change standby-timeout-ac 120
-    
+    if($NoStandby){
+	powercfg /Change standby-timeout-ac 0
+    }
+    else{
+        powercfg /Change standby-timeout-ac 120
+    }
 
 }
+
 
 function InstallWinget{
 
@@ -300,6 +310,52 @@ function Apply-GP
     $global:installer += "`nCopy-Item '$global:path\GP\*' -Destination 'C:\Windows\System32' -Force -Recurse`n`n"
 }
 
+function Download-Manual
+{
+    param(
+        [string]$Link,
+        [string]$Filename
+    )
+
+    if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
+    {
+        New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
+    }
+
+    Invoke-WebRequest -Uri $Link -OutFile "C:\Users\Public\Desktop\Manuals and Instructions\$Filename"
+}
+
+function Install-QCAD
+{
+    $global:installer += "Invoke-WebRequest -Uri https://www.qcad.org/archives/qcad/qcad-" + $global:QCADversion + "-trial-win64-installer.msi -OutFile " + $global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi`n"
+    $global:installer += "Start-Process msiexec.exe -Wait -ArgumentList '/I " + $global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi" + " /quiet'`n"
+    
+    $global:installer += 'Remove-Item ($global:path + "\qcad-" + $global:QCADversion + "trial-win64-installer.msi")' + "`n"
+    
+    $global:installer += 'foreach ($QCADDLL in $global:QCADDLLs)
+    {
+	if(Test-Path "C:\Program Files\QCAD\plugins\$QCADDLL") {
+	   Remove-Item "C:\Program Files\QCAD\plugins\$QCADDLL"
+	}
+    }' + "`n"
+
+     $global:installer += 'Download-Manual -Link "https://qcad.org/doc/qcad/latest/reference/en/qcad_reference_manual_en.pdf" -Filename "qcad_reference_manual_en.pdf"' + "`n"
+#    $global:installer += 'if(!(Test-path "C:\Users\Public\Desktop\Manuals and Instructions"))
+#    {
+#	New-Item -Path "C:\Users\Public\Desktop\Manuals and Instructions" -ItemType Directory
+#    }' + "`n"
+#    $global:installer += "Invoke-WebRequest -Uri 'https://qcad.org/qcad/book/qcad_book_preview_en.pdf' -OutFile " + '"C:\Users\Public\Desktop\Manuals and Instructions\' + 'qcad_book_preview_en.pdf"'
+}
+
+function Libreoffice-Docs
+{
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/CG7.6/CG76-CalcGuide.pdf' -Filename 'CG76-CalcGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/DG7.6/DG76-DrawGuide.pdf' -Filename 'DG76-DrawGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/IG7.6/IG76-CalcGuide.pdf' -Filename 'IG76-ImpressGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/WG7.6/WG76-WriterGuide.pdf' -Filename 'WG76-WriterGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/GS7.5/GS75-GettingStarted.pdf' -Filename 'GS75-GettingStarted.pdf'
+}
+
 function Install-TV
 {
     $global:installer += "winget install TeamViewer.TeamViewer.Host --scope machine`n"
@@ -355,7 +411,7 @@ function Programs-Menu
 {
     param(
         
-        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8','d')
+        $programsAvailable = @('1', '2', '3', '4', '5', '6', '7', '8', '9','d')
     )
 
 #    switch($programsAvailable){
@@ -371,6 +427,7 @@ function Programs-Menu
         '6' {Write-Host "6: Gnucash"}
         '7' {Write-Host "7: Google Earth Pro"}  
         '8' {Write-Host "8: DreamPlan"}
+	'9' {Write-Host "9: QCAD Community"}
         'd' {Write-Host "D: Done"}
     }
 
@@ -379,7 +436,7 @@ function Programs-Menu
 #    if(-Not ($programsAvailable.Contains($selection) -AND (-Not ($selection -eq 'd')))){
     if(-Not ($programsAvailable.Contains($selection.ToLower()))){
         
-        if(($selection -gt 0) -or ($selection -lt 8))
+        if(($selection -gt 0) -or ($selection -lt 9))
         {
             "ERROR: Option has already been selected."
 	    $env:selection
@@ -395,14 +452,15 @@ function Programs-Menu
         switch -Regex ($selection)
         {
             '1' {$global:installer += "winget install Mozilla.Thunderbird`n";Programs-Menu ($programsAvailable -ne '1');return}
-            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n";Programs-Menu ($programsAvailable -ne '2');return}
+            '2' {$global:installer += "winget install TheDocumentFoundation.LibreOffice --scope machine`n" + "Libreoffice-Docs`n";Programs-Menu ($programsAvailable -ne '2');return}
             '3' {$global:installer += "winget install GIMP.GIMP --scope machine`n";Programs-Menu ($programsAvailable -ne '3');return}
             '4' {$global:installer += "winget install DuongDieuPhap.ImageGlass --scope machine`n";Programs-Menu ($programsAvailable -ne '4');return}
             '5' {$global:installer += "winget install VideoLAN.VLC --scope machine`n";Programs-Menu ($programsAvailable -ne '5');return}
-            '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n";Programs-Menu ($programsAvailable -ne '6');return}
+            '6' {$global:installer += "winget install GnuCash.GnuCash --scope machine`n" + "Download-Manual -Link 'https://code.gnucash.org/docs/C/gnucash-guide.pdf' -Filename 'gnucash-guide.pdf'`n";Programs-Menu ($programsAvailable -ne '6');return}
             '7' {$global:installer += "winget install Google.EarthPro --scope machine`n";Programs-Menu ($programsAvailable -ne '7');return}
             #DreamPlan
             '8' {$global:installer += "winget install 9NXSX2KDNKMT --scope machine`n";Programs-Menu ($programsAvailable -ne '8');return}
+	    '9' {Install-QCAD;Programs-Menu ($programsAvailable -ne '9');return}
             'd' {return}
             '^*' {"ERROR: Unrecognized Option -sw"; Programs-Menu $programsAvailable}
             
@@ -426,8 +484,8 @@ function Import-StartMenuOptions
 
 function Reset-UserExecutionPolicy
 {
-    "Set-ExecutionPolicy -Scope CurrentUser Undefined"
-    "Set-ExecutionPolicy -Scope LocalMachine Undefined"
+    Set-ExecutionPolicy -Scope CurrentUser Undefined
+    Set-ExecutionPolicy -Scope LocalMachine Undefined
 }
 
 function Update-Windows
@@ -435,7 +493,9 @@ function Update-Windows
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
     $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -AutoReboot`n" #-AutoReboot
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install`n" #-AutoReboot
+    $global:installer += "Change-Power-Settings`n"
+    $global:installer += "Restart-Computer -Force`n"
 
 }
 
@@ -518,7 +578,7 @@ function Script-Menu
     switch -Regex ($selection)
     {
         '1' {RunInit 0; return} #run init with special text
-        '2' {RunPostInit; RunInit 1; Reset-UserExectutionPolicy; return} #run Post Init and Init without special text
+        '2' {RunPostInit; RunInit 1; Reset-UserExecutionPolicy; return} #run Post Init and Init without special text
         'q' {exit}
         '^*' {"`nERROR: Unrecognized Option`n"; Script-Menu}
     }
@@ -526,7 +586,7 @@ function Script-Menu
 
 NetworkTest 
 CheckDrive 
-Change-Power-Settings 
+Change-Power-Settings -NoStandby
 
 #InstallWinget 
 #InstallPWSH 
@@ -536,7 +596,8 @@ Change-Power-Settings
 if(Test-Path ($global:path + "\InitialSetupDone")) #run Script unless init file is found
 {
     RunPostInit
-    Reset-UserExectutionPolicy
+    Reset-UserExecutionPolicy
+    Change-Power-Settings
 }
 else
 {
