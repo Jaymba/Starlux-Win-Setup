@@ -52,7 +52,7 @@ if (!
 $global:installer = ""
 $global:username = ""
 $global:path = Split-Path ($MyInvocation.MyCommand.Path) -Parent 
-$global:QCADversion = "3.28.2"
+$global:QCADversion = "3.29.4"
 $global:QCADDLLs = 'qcaddwg.dll','qcadpdf.dll','qcadpolygon.dll','qcadproj.dll','qcadproscripts.dll','qcadshp.dll','qcadtrace.dll','qcadtriangulation.dll','qcadspatialindexpro.dll'
 function RunPWSH($MyInvocation, $args){
 
@@ -155,17 +155,18 @@ function InstallWinget{
 	     Add-AppxPackage 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
 	}
 
-	if((Get-AppxPackage -name 'Microsoft.UI.Xaml.2.7*') -eq $null){ #check if any version of Microsoft.UI.Xaml.2.7 exists
+	if((Get-AppxPackage -name 'Microsoft.UI.Xaml.2.8*') -eq $null){ #check if any version of Microsoft.UI.Xaml.2.7 exists
 	     Write-Host 'Installing Microsoft.UI.Xaml'
-	     Invoke-WebRequest -Uri 'https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3' -OutFile ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
-	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip') -DestinationPath ($global:path + '\Microsoft.UI.Xaml.2.7.3')
-	     Add-AppxPackage ($global:path + '\Microsoft.UI.Xaml.2.7.3\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.7.appx')
-             Remove-Item ($global:path + '\Microsoft.UI.Xaml.2.7.3.zip')
-             Remove-Item -Recurse ($global:path + '\Microsoft.UI.Xaml.2.7.3')
+	     Invoke-WebRequest -Uri 'https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.8.6' -OutFile ($global:path + '\Microsoft.UI.Xaml.2.8.6.zip')
+	     Expand-Archive -path ($global:path + '\Microsoft.UI.Xaml.2.8.6.zip') -DestinationPath ($global:path + '\Microsoft.UI.Xaml.2.8.6')
+	     Add-AppxPackage ($global:path + '\Microsoft.UI.Xaml.2.8.6\tools\AppX\x64\Release\Microsoft.UI.Xaml.2.8.appx')
+             Remove-Item ($global:path + '\Microsoft.UI.Xaml.2.8.6.zip')
+             Remove-Item -Recurse ($global:path + '\Microsoft.UI.Xaml.2.8.6')
 	}
 
 	Write-Host 'Installing WinGet'
-        Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
+	Invoke-WebRequest -Uri 'https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle' -OutFile ($global:path + '\WinGet.msixbundle')
+	taskkill /im WindowsPackageManagerServer.exe /f
         Add-AppxPackage ($global:path + '\WinGet.msixbundle')
         Remove-Item ($global:path + '\Winget.msixbundle')
     }
@@ -351,7 +352,7 @@ function Libreoffice-Docs
 {
      Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/CG7.6/CG76-CalcGuide.pdf' -Filename 'CG76-CalcGuide.pdf'
      Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/DG7.6/DG76-DrawGuide.pdf' -Filename 'DG76-DrawGuide.pdf'
-     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/IG7.6/IG76-CalcGuide.pdf' -Filename 'IG76-ImpressGuide.pdf'
+     Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/IG7.6/IG76-ImpressGuide.pdf' -Filename 'IG76-ImpressGuide.pdf'
      Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/WG7.6/WG76-WriterGuide.pdf' -Filename 'WG76-WriterGuide.pdf'
      Download-Manual -Link 'https://documentation.libreoffice.org/assets/Uploads/Documentation/en/GS7.5/GS75-GettingStarted.pdf' -Filename 'GS75-GettingStarted.pdf'
 }
@@ -493,7 +494,7 @@ function Update-Windows
     $global:installer += "`nInstall-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force`n"
     $global:installer += "Install-Module PSWindowsUpdate -Force`n"
 
-    $global:installer += "Get-WindowsUpdate -AcceptAll -Install`n" #-AutoReboot
+    $global:installer += "Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot`n" #-AutoReboot
     $global:installer += "Change-Power-Settings`n"
     $global:installer += "Restart-Computer -Force`n"
 
